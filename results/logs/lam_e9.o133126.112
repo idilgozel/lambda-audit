@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00b-022.myriad.ucl.ac.uk
+task      : 112 -> config line 16, seed 4
+args      : --env PositionOnlyCartPoleHard --arch mlp --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --results-name results_phase2.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-13T11:08:22Z
+{"run": "PositionOnlyCartPoleHard_mlp_lam1.0_s4", "env": "PositionOnlyCartPoleHard", "arch": "mlp", "lam": 1.0, "seed": 4, "final_return": 0.08440833333333331, "deployed_return": 0.09354999999999995, "gap_value": -0.0822681423150995, "gap_lambda": 0.0, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 1923.6}
+finished  : 2026-08-13T11:40:52Z

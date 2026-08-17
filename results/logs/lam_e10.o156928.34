@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-t00a-003.myriad.ucl.ac.uk
+task      : 34 -> config line 34, seed 1
+args      : --env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 20.07708 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-17T16:14:10Z
+{"run": "GLEAM_g2_h0.05_linearb_lam0.8_s1", "env": "GLEAM_g2_h0.05", "arch": "linearb", "lam": 0.8, "seed": 1, "final_return": -42.05428020604193, "deployed_return": -0.35475142483045297, "gap_value": -3.3273765937460658, "gap_lambda": -3.286135488586825, "total_timesteps": 15000000, "gamma": 0.9975031223974601, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 1886.5, "final_bias": 4.647629261016846, "final_gain": 17.09895897102848, "J_rate": 0.35475142483045297, "excess_cost": 2.062238032115289, "fix_sigma": 0.3, "ref_J_opt": 0.1551926811992476, "ref_k_ml": 1.3474186055872241, "ref_J_ml": 0.1720225402237275, "ref_k_AC": 23.919955401574022, "ref_J_AC": 0.2959255423281913, "ref_rThK0": 0.3, "arm": "coupled"}
+finished  : 2026-08-17T16:45:40Z

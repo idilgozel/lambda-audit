@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00a-138.myriad.ucl.ac.uk
+task      : 77 -> config line 29, seed 2
+args      : --env RepeatPreviousMedium --arch gru128 --gae-lambda 0.9 --total-timesteps 15000000
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-10T15:30:03Z
+{"run": "RepeatPreviousMedium_gru128_lam0.9_s2", "env": "RepeatPreviousMedium", "arch": "gru128", "lam": 0.9, "seed": 2, "final_return": -0.34527777777777785, "deployed_return": -0.3555555555555555, "gap_value": -0.05721957295515127, "gap_lambda": -0.06478258412035352, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 15959.9}
+finished  : 2026-08-10T19:56:07Z

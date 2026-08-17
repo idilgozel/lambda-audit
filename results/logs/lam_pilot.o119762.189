@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00a-236.myriad.ucl.ac.uk
+task      : 189 -> config line 45, seed 4
+args      : --env PositionOnlyCartPoleEasy --arch gru128 --gae-lambda 0.9 --total-timesteps 15000000
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-10T15:41:11Z
+{"run": "PositionOnlyCartPoleEasy_gru128_lam0.9_s4", "env": "PositionOnlyCartPoleEasy", "arch": "gru128", "lam": 0.9, "seed": 4, "final_return": 0.9600500000000005, "deployed_return": 0.9486500000000007, "gap_value": 0.04003261891098474, "gap_lambda": 0.036374308972213526, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 13815.5}
+finished  : 2026-08-10T19:31:31Z

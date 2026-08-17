@@ -1,0 +1,64 @@
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.8 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 60.071834 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.8 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 60.071834 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.9 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 57.80993 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.9 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 57.80993 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.95 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 54.142926 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.95 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 54.142926 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.98 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 46.176014 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.98 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 46.176014 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.99 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 37.359041 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.99 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 37.359041 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.995 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 25.550589 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.995 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 25.550589 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 0.999 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 1.671172 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 0.999 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 1.671172 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linear --gae-lambda 1.0 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 1.54499 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.02 --arch linearb --gae-lambda 1.0 --gamma 0.999000499833375 --fix-sigma 0.3 --linear-gain-init 1.54499 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 22.426983 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 22.426983 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 20.546902 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 20.546902 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 17.670634 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 17.670634 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 11.394604 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 11.394604 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 2.197126 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 2.197126 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.756354 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.756354 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.548754 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.548754 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linear --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.506599 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g1_h0.05 --arch linearb --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.506599 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 20.07708 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 20.07708 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 16.82564 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 16.82564 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 11.046191 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 11.046191 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.646322 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.646322 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.42903 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.42903 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.343181 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.343181 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.281927 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.281927 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linear --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.26748 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g2_h0.05 --arch linearb --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.26748 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 14.515075 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.8 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 14.515075 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 2.175412 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.9 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 2.175412 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.453986 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.453986 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.226369 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.226369 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.164381 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.99 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.164381 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.135285 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.995 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.135285 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.112818 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.112818 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linear --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.107307 --total-timesteps 15000000 --results-name results_e10.jsonl
+--env GLEAM_g4_h0.05 --arch linearb --gae-lambda 1.0 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 1.107307 --linear-bias-init 1.0 --total-timesteps 15000000 --results-name results_e10.jsonl

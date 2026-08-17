@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00a-088.myriad.ucl.ac.uk
+task      : 83 -> config line 35, seed 2
+args      : --env PositionOnlyCartPoleEasy --arch mlp --gae-lambda 0.99 --total-timesteps 15000000
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-10T15:30:05Z
+{"run": "PositionOnlyCartPoleEasy_mlp_lam0.99_s2", "env": "PositionOnlyCartPoleEasy", "arch": "mlp", "lam": 0.99, "seed": 2, "final_return": 0.25555000000000017, "deployed_return": 0.24155000000000015, "gap_value": 0.15872507138008107, "gap_lambda": 0.05409614584423028, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 1742.4}
+finished  : 2026-08-10T15:59:11Z

@@ -1,0 +1,18 @@
+# Raw training curves: 245 MB across 562 files, and they are DERIVED data —
+# every figure and every scored statistic is reproducible from the results
+# JSONL plus the harness. Committing them would make the repo unclonable for
+# the reviewers who most want to check it.
+#
+# NOT ignored, deliberately: results/results/*.jsonl (300 KB, the scored data)
+# and results/logs/ (2.4 MB, carries the per-job node provenance the paper
+# reports). Those two are the audit trail and must be in history.
+#
+# If curves are needed for release, publish them as a versioned archive
+# (Zenodo / GitHub Release asset) and cite the DOI in the paper.
+results/results/curves_*.csv
+
+__pycache__/
+*.pyc
+.DS_Store
+*.bak-*
+.expected_md5

@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00a-249.myriad.ucl.ac.uk
+task      : 108 -> config line 12, seed 5
+args      : --env GLEAM_g2_h0.05 --arch mlp --gae-lambda 0.98 --gamma 0.9975031223974601 --fix-sigma 0.3 --total-timesteps 15000000 --results-name results_phase2.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-14T10:20:20Z
+{"run": "GLEAM_g2_h0.05_mlp_lam0.98_s5", "env": "GLEAM_g2_h0.05", "arch": "mlp", "lam": 0.98, "seed": 5, "final_return": -14.466341003188122, "deployed_return": -0.16801879582454987, "gap_value": -2.2607080621495577, "gap_lambda": -2.008672774225721, "total_timesteps": 15000000, "gamma": 0.9975031223974601, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 3379.5, "final_gain": 1.4642629271040044, "J_rate": 0.16801879582454987, "excess_cost": 0.9767254663605683, "fix_sigma": 0.3, "ref_J_opt": 0.1551926811992476, "ref_k_ml": 1.3474186055872241, "ref_J_ml": 0.1720225402237275, "ref_k_AC": 23.919955401574022, "ref_J_AC": 0.2959255423281913, "ref_rThK0": 0.3, "arm": "coupled"}
+finished  : 2026-08-14T11:17:24Z
