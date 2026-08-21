@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-t00a-004.myriad.ucl.ac.uk
+task      : 28 -> config line 12, seed 2
+args      : --env BattleshipEasy --arch gru128 --gae-lambda 0.98 --gamma 0.99 --total-timesteps 15000000 --results-name results_e11.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-21T00:13:10Z
+{"run": "BattleshipEasy_gru128_lam0.98_s2", "env": "BattleshipEasy", "arch": "gru128", "lam": 0.98, "seed": 2, "final_return": -0.43999999999999984, "deployed_return": -0.41333333333333316, "gap_value": -0.011383142940537234, "gap_lambda": 0.0007562120717547592, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 8312.4}
+finished  : 2026-08-21T02:31:48Z

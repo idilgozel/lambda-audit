@@ -1,0 +1,2 @@
+--env MineSweeperMedium --arch mlp --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --results-name results_e12.jsonl
+--env MineSweeperMedium --arch gru128 --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --results-name results_e12.jsonl

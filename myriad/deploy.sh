@@ -45,6 +45,8 @@ FILES=(
   "myriad/configs_e9.txt"
   "myriad/configs_e10.txt"
   "myriad/configs_e11.txt"
+  "myriad/configs_e12_probe.txt"
+  "myriad/configs_e12.txt"
   "myriad/pilot_array.qsub.sh"
   "myriad/bootstrap_myriad.sh"
 )
@@ -88,11 +90,39 @@ echo "     connected"
 say "3/6  shipping (single tar stream, flat layout)"
 # --------------------------------------------------------------------------
 "${SSH[@]}" "mkdir -p ~/$REMOTE/logs ~/$REMOTE/results" || die "could not create ~/$REMOTE"
+
+# macOS xattrs, 2026-08-18. Files written to this Mac by tooling carry
+# com.apple.provenance. bsdtar encodes every xattr as a pax extended header;
+# GNU tar on Myriad then prints "Ignoring unknown extended header keyword" for
+# each one, and depending on version and --warning defaults can exit non-zero,
+# which this pipeline correctly read as a failed transfer and incorrectly
+# reported without saying which end failed. Strip them at the source where the
+# local tar supports it, tell the remote tar the keyword is noise, and report
+# each side's status separately so the next failure names itself.
+TAR_FLAGS=()
+_tarhelp="$(tar --help 2>&1 || true)"
+case "$_tarhelp" in *--no-xattrs*) TAR_FLAGS+=(--no-xattrs) ;; esac
+case "$_tarhelp" in *--no-mac-metadata*) TAR_FLAGS+=(--no-mac-metadata) ;; esac
+export COPYFILE_DISABLE=1
+
 # transform strips the leading directories so everything lands flat, which is
 # what ppo_lambda.py expects (it imports envs_native from its own directory)
-tar czf - -C "$ROOT" "${FILES[@]}" \
-  | "${SSH[@]}" "cd ~/$REMOTE && tar xzf - --strip-components=1 && chmod +x *.sh" \
-  || die "transfer failed"
+tar ${TAR_FLAGS+"${TAR_FLAGS[@]}"} -czf - -C "$ROOT" "${FILES[@]}" \
+  | "${SSH[@]}" "cd ~/$REMOTE && tar xzf - --strip-components=1 \
+                 --warning=no-unknown-keyword && chmod +x *.sh"
+XFER=("${PIPESTATUS[@]}")
+if [ "${XFER[0]}" != "0" ] || [ "${XFER[1]}" != "0" ]; then
+  echo
+  echo "     diagnosing (local tar=${XFER[0]}, remote extract=${XFER[1]})..."
+  "${SSH[@]}" "cd ~/$REMOTE 2>/dev/null && echo '     remote dir OK' || echo '     REMOTE DIR MISSING'; \
+               echo -n '     quota: '; lquota 2>/dev/null | tail -3 || df -h ~ | tail -1" || true
+  die "transfer failed (local tar=${XFER[0]}, remote extract=${XFER[1]}).
+     local non-zero  -> a source file is unreadable, or the local tar rejected
+                        a flag. Re-run and read the tar error above.
+     remote non-zero -> most often Scratch quota. The audit has written ~1000
+                        runs of curves there; check the quota line above and
+                        clear old curves on Myriad if it is full."
+fi
 echo "     sent ${#FILES[@]} files"
 
 # --------------------------------------------------------------------------
@@ -246,6 +276,34 @@ EOM
          python3 prereg_e10.py results/results/results_e10.jsonl
 EOM
     ;;
+  --e12probe)
+    # THE PROBE COMES FIRST. E11 ran its capability gates after an 80-run grid
+    # and spent 119 core-hours learning what 2 runs would have shown. Read this
+    # output, check it against prereg_e12.py's G12a/G12b/G12c, and only then
+    # submit --e12.
+    if ! python3 "$ROOT/prereg_e12.py" >/dev/null 2>&1; then
+      die "prereg_e12.py is not frozen. Nothing submitted."
+    fi
+    submit lam_e12p configs_e12_probe.txt 1-2 ""
+    cat <<'EOM'
+
+     Capability probe only: mlp and gru128 at lambda 1.0, seed 1.
+     Gates to clear before the grid (prereg_e12.py):
+         G12a mlp >= -0.30    G12b gru >= -0.10    G12c gap >= 0.05
+     Collect, then:  python3 prereg_e12.py results/results/results_e12.jsonl
+EOM
+    ;;
+  --e12)
+    if ! python3 "$ROOT/prereg_e12.py" >/dev/null 2>&1; then
+      die "prereg_e12.py is not frozen. Nothing submitted."
+    fi
+    submit lam_e12 configs_e12.txt 1-80 ""
+    cat <<'EOM'
+
+     E12 grid. Scoring:
+         python3 prereg_e12.py results/results/results_e12.jsonl
+EOM
+    ;;
   --e11)
     # E11: BattleshipEasy, the closed-loop POPGym arm. Writes results_e11.jsonl.
     if ! python3 "$ROOT/prereg_e11.py" >/dev/null 2>&1; then
@@ -302,6 +360,8 @@ EOM
          bash myriad/deploy.sh $USER_NAME --e9     160 runs
          bash myriad/deploy.sh $USER_NAME --e10    192 runs, after E7 is scored
          bash myriad/deploy.sh $USER_NAME --e11     80 runs, Battleship closed-loop
+         bash myriad/deploy.sh $USER_NAME --e12probe  2 runs, capability probe FIRST
+         bash myriad/deploy.sh $USER_NAME --e12     80 runs, only after the probe clears
 EOM
     ;;
 esac

@@ -33,6 +33,7 @@ __all__ = [
     "RepeatPreviousHard", "PositionOnlyCartPole", "PositionOnlyCartPoleEasy",
     "PositionOnlyCartPoleMedium", "PositionOnlyCartPoleHard",
     "Battleship", "BattleshipEasy",
+    "MineSweeper", "MineSweeperEasy", "MineSweeperMedium",
     "Discrete", "Box", "make",
 ]
 
@@ -350,6 +351,103 @@ class BattleshipEasy(Battleship):
         super().__init__(board_size=8, ship_sizes=(2, 3, 3, 4))
 
 
+# --- MineSweeper -----------------------------------------------------------
+
+class MineSweeper:
+    """MineSweeper with the board obscured: the agent sees only the adjacent
+    mine count of the tile it clicked.
+
+    Mirrors popgym.envs.minesweeper.MineSweeper. Mine placement (a single
+    replace=False choice), the neighbour-count convolution, the three reward
+    branches, the win test and the truncation rule are copied exactly;
+    test_minesweeper_equivalence.py asserts bitwise identity against popgym
+    including the hidden board after seeded resets.
+
+    Two interface adaptations, ours, both documented:
+
+    1. popgym's action space is MultiDiscrete([r, c]); ours is the flat
+       Discrete(r*c) with action = row * c + col, because the harness's policy
+       head is a single Categorical. Bijection; the equivalence test drives
+       both envs through matched pairs.
+    2. popgym sets obs_requires_prev_action = True and their baselines append
+       the previous action via a wrapper. We fold that in: the observation is
+       [onehot_k(count), onehot_r(prev_row), onehot_c(prev_col)], zeros for the
+       prev-action block at reset. Without it the agent cannot know WHICH tile
+       produced the count, and the task is not the POMDP the benchmark intends.
+    """
+
+    CLEAR, MINE, VIEWED = 0, 1, 2
+
+    def __init__(self, dims=(4, 4), num_mines=2):
+        self.dims = tuple(dims)
+        self.num_mines = int(num_mines)
+        self.max_episode_length = self.dims[0] * self.dims[1] - self.num_mines
+        self.success_reward_scale = 1 / self.max_episode_length
+        self.fail_reward_scale = -0.5 - self.success_reward_scale
+        self.bad_action_reward_scale = -0.5 / (self.max_episode_length - 2)
+        self.n_counts = min(self.num_mines + 1, 10)
+        self.obs_dim = self.n_counts + self.dims[0] + self.dims[1]
+        self.action_space = Discrete(self.dims[0] * self.dims[1])
+        self.observation_space = Box(0.0, 1.0, (self.obs_dim,), np.float32)
+        self.rng = _make_rng(None)
+        self.hidden_grid = None
+        self.neighbor_grid = None
+        self.timestep = 0
+
+    def _obs(self, count, row=None, col=None):
+        v = np.zeros(self.obs_dim, dtype=np.float32)
+        v[min(int(count), self.n_counts - 1)] = 1.0
+        if row is not None:
+            v[self.n_counts + row] = 1.0
+            v[self.n_counts + self.dims[0] + col] = 1.0
+        return v
+
+    def reset(self, seed=None, options=None):
+        if seed is not None:
+            self.rng = _make_rng(seed)
+        self.hidden_grid = np.full(self.dims, self.CLEAR, dtype=np.int8)
+        mines_flat = self.rng.choice(
+            np.arange(self.dims[0] * self.dims[1]), size=self.num_mines,
+            replace=False)
+        self.hidden_grid.ravel()[mines_flat] = self.MINE
+        self.neighbor_grid = np.zeros_like(self.hidden_grid)
+        src = np.pad(self.hidden_grid, [(1, 1), (1, 1)], constant_values=0)
+        for si in (-1, 0, 1):
+            for sj in (-1, 0, 1):
+                self.neighbor_grid += np.roll(np.roll(src, si, 0), sj, 1)[1:-1, 1:-1]
+        self.timestep = 0
+        return self._obs(0), {}
+
+    def step(self, action):
+        a = int(action)
+        row, col = divmod(a, self.dims[1])
+        idx = (row, col)
+        terminated = truncated = False
+        if self.hidden_grid[idx] == self.MINE:
+            terminated = True
+            reward = self.fail_reward_scale
+        elif self.hidden_grid[idx] == self.VIEWED:
+            reward = self.bad_action_reward_scale
+        else:
+            self.hidden_grid[idx] = self.VIEWED
+            reward = self.success_reward_scale
+        self.timestep += 1
+        terminated |= bool(np.all(self.hidden_grid != self.CLEAR).item())
+        truncated = (self.timestep == self.max_episode_length) and not terminated
+        count = self.neighbor_grid[idx].item()
+        return self._obs(count, row, col), reward, terminated, truncated, {}
+
+
+class MineSweeperEasy(MineSweeper):
+    def __init__(self):
+        super().__init__(dims=(4, 4), num_mines=2)
+
+
+class MineSweeperMedium(MineSweeper):
+    def __init__(self):
+        super().__init__(dims=(6, 6), num_mines=6)
+
+
 # --- registry --------------------------------------------------------------
 
 REGISTRY = {
@@ -361,6 +459,8 @@ REGISTRY = {
     "PositionOnlyCartPoleMedium": PositionOnlyCartPoleMedium,
     "PositionOnlyCartPoleHard": PositionOnlyCartPoleHard,
     "BattleshipEasy": BattleshipEasy,
+    "MineSweeperEasy": MineSweeperEasy,
+    "MineSweeperMedium": MineSweeperMedium,
 }
 
 
