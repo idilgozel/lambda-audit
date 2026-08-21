@@ -21,7 +21,11 @@ ssh -o ControlMaster=yes -o ControlPath="$CTL" -o ControlPersist=20m \
 SSH=(ssh -o ControlPath="$CTL" "$USER_NAME@$HOST")
 
 echo "=== queue state"
-"${SSH[@]}" "qstat 2>/dev/null | grep -E 'lam_cap|lam_pilot|lam_e6|lam_e7|lam_e9|lam_e10|job-ID|---' || echo '  no lambda-audit jobs queued or running'"
+# Every job name deploy.sh can submit must appear here. A name missing from
+# this filter makes a RUNNING job report as "no jobs queued", which is worse
+# than no queue section at all: it reads as "the run is done, go collect".
+# lam_e12 also matches lam_e12p by prefix; both are listed for legibility.
+"${SSH[@]}" "qstat 2>/dev/null | grep -E 'lam_cap|lam_pilot|lam_e6|lam_e7|lam_e9|lam_e10|lam_e11|lam_e12p|lam_e12|job-ID|---' || echo '  no lambda-audit jobs queued or running'"
 
 echo
 echo "=== pulling results, curves and logs"
@@ -43,10 +47,12 @@ fi
 PILOT_JSONL="$DEST/results/results_lambda_pilot.jsonl"
 PHASE2_JSONL="$DEST/results/results_phase2.jsonl"
 E10_JSONL="$DEST/results/results_e10.jsonl"
+E11_JSONL="$DEST/results/results_e11.jsonl"
+E12_JSONL="$DEST/results/results_e12.jsonl"
 
 echo
 echo "=== what arrived"
-for f in "$PILOT_JSONL" "$PHASE2_JSONL" "$E10_JSONL"; do
+for f in "$PILOT_JSONL" "$PHASE2_JSONL" "$E10_JSONL" "$E11_JSONL" "$E12_JSONL"; do
   if [ -f "$f" ]; then
     printf '  %-28s %s rows\n' "$(basename "$f")" "$(wc -l < "$f" | tr -d ' ')"
   else
@@ -197,4 +203,60 @@ if [ -f "$PHASE2_JSONL" ]; then
   python3 "$ROOT/prereg_phase2.py" "$PHASE2_JSONL"
 else
   echo "  no phase2 results file yet"
+fi
+
+echo
+echo "=== preregistered gates: E11 (BattleshipEasy)"
+if [ -f "$E11_JSONL" ]; then
+  python3 "$ROOT/prereg_e11.py" "$E11_JSONL" 2>&1 || true
+else
+  echo "  no results_e11.jsonl yet"
+fi
+
+echo
+echo "=== E12 coverage (MineSweeperMedium)"
+# E12 is submitted in TWO stages against ONE results file: a 2-run probe
+# (mlp + gru128 at lambda 1.0, seed 1) whose gates are read BEFORE the 80-run
+# grid. So a row count is ambiguous on its own and the stage is named here.
+if [ -f "$E12_JSONL" ]; then
+  python3 - "$E12_JSONL" <<'PY3'
+import json, sys, collections
+rows = [json.loads(l) for l in open(sys.argv[1]) if l.strip()]
+if not rows:
+    print("  results_e12.jsonl is present but empty"); sys.exit(0)
+by = collections.Counter((r.get("arch", ""), r.get("lam")) for r in rows)
+n = len(rows)
+stage = ("probe (of 2)" if n <= 2 else
+         "grid (of 80)" if n >= 3 else "unknown")
+print(f"  {n} rows -- stage: {stage}")
+for k in sorted(by, key=lambda t: (t[0], t[1] if t[1] is not None else -1)):
+    print(f"      {k[0]:10} lam {str(k[1]):<6} {by[k]:4d}")
+probe = [r for r in rows if r.get("lam") == 1.0 and r.get("seed") == 1]
+have = {r.get("arch") for r in probe}
+missing = {"mlp", "gru128"} - have
+if missing:
+    print(f"  probe INCOMPLETE: still waiting on {sorted(missing)} at lam 1.0 seed 1")
+    print("  Gates cannot be read yet. Do NOT submit the grid.")
+else:
+    print("  probe complete: both arms present at lam 1.0 seed 1. Gates readable below.")
+d = collections.Counter()
+for r in rows:
+    try:
+        d[(str(r.get("arch")), round(float(r.get("lam")), 6), int(r.get("seed")))] += 1
+    except (TypeError, ValueError):
+        pass
+bad = {k: c for k, c in d.items() if c > 1}
+if bad:
+    print(f"  WARNING: {len(bad)} duplicated (arch, lambda, seed) cells")
+PY3
+else
+  echo "  no results_e12.jsonl yet"
+fi
+
+echo
+echo "=== preregistered gates: E12 (read these BEFORE submitting the grid)"
+if [ -f "$E12_JSONL" ]; then
+  python3 "$ROOT/prereg_e12.py" "$E12_JSONL" 2>&1 || true
+else
+  echo "  no results_e12.jsonl yet"
 fi

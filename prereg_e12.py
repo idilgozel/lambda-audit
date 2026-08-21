@@ -107,6 +107,26 @@ P15.3  THRESHOLD LOCATION. The mlp degradation onset bracket contains the
        multiple-comparison inflation were found by running this scorer on
        synthetic data drawn from the predicted pattern.
 
+AMENDMENT 1, 2026-08-21, POST-DATA, DISCLOSED. Scored thresholds unchanged.
+--------------------------------------------------------------------------
+State when written: results_e12.jsonl held ONE row, the probe's mlp arm at
+lambda 1.0 seed 1 (deployed_return -0.14639285714285719); the gru probe task
+was still in the queue. No gate had been read and no P15 cell existed.
+
+Defect: score() read the gates, and on the PASS path went straight into P15.1,
+which bootstraps lambda=0.95 cells. During the probe stage those cells do not
+exist, so _boot divided by zero and the scorer crashed -- on the success path
+only. A gate FAILURE printed correctly; a gate PASS traced back. Found by
+running this scorer against three synthetic probe states (mlp-only, all-pass,
+gru-fails) before the gru task returned.
+
+Fix: a data-sufficiency guard between the gates and P15.1, in the same form as
+the existing "MISSING lambda=1.0 cells" guard above it. If the lambda=0.95
+cells are absent, print that the gates passed and that P15 awaits the grid,
+then return. No constant, no threshold, no comparison and no verdict is
+touched; a run of this file on the complete 80-run grid produces byte-identical
+output to the frozen version. The amendment converts a crash into a message.
+
 HOW A MISS IS READ, fixed in advance. P15.1 failing: the measured value of
 memory does not depend on lambda here, and the practical claim does not
 generalise to this benchmark; reported. P15.1 passing with P15.2 failing: the
@@ -219,6 +239,17 @@ def score(path):
         return 0
 
     m95, g95 = cell(rows, "mlp", DEFAULT_LAM), cell(rows, "gru128", DEFAULT_LAM)
+    # Amendment 1 (2026-08-21, post-data, disclosed above). The gates are read
+    # at the PROBE stage, where no lambda=0.95 cell exists yet; without this
+    # the all-gates-pass path fell into _boot on an empty cell and crashed.
+    # Verdict-neutral: on the full grid this branch is never taken.
+    if not m95 or not g95:
+        print(f"\nAll gates PASS. P15 NOT SCORABLE YET: no lambda="
+              f"{DEFAULT_LAM} cells in this file, i.e. the 80-run grid has not "
+              f"been collected.")
+        print("Next: bash myriad/deploy.sh <ucl_username> --e12")
+        print("VERDICTS:", {k: ('PASS' if b else 'FAIL') for k, b in v.items()})
+        return 0
     rng = random.Random(BOOT_SEED)
     lo, hi = _boot(rng, [(g95, 1), (m95, -1), (g1, -1), (m1, 1)])
     point = (iqm(g95) - iqm(m95)) - (ig1 - im1)

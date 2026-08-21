@@ -25,9 +25,10 @@ to submit if a check fails. Amendments are dated; post-data amendments are
 disclosed as such in the file that carries them. Scoring refuses to run on data
 with duplicated cells.
 
-Scored to date: 11 predictions passed, 6 failed, 1 partial. The failures are
+Scored to date: 13 predictions passed, 9 failed, 1 partial. The failures are
 part of the record and are analysed rather than removed — one of them (E7)
-produced the project's most informative result.
+produced the project's most informative result, and the E10 failures are
+diagnosed in `e10-above-knee-drift.md`.
 
 ## Preregistrations
 
@@ -37,6 +38,9 @@ produced the project's most informative result.
 | `prereg_phase2.py` | E6 minimal pair, E7 quantitative law, E9 corroboration | 2026-08-12 |
 | `prereg_e7_bias.py` | Mechanism threshold predictions | 2026-08-14 |
 | `prereg_e10.py` | In-domain cost law and perturbation-decay test | 2026-08-14 |
+| `prereg_e8.py` | Intermittency diagnostic tripwires | 2026-08-18 |
+| `prereg_e11.py` | External validity, BattleshipEasy (gates failed; see `e11-findings.md`) | 2026-08-18 |
+| `prereg_e12.py` | External validity, MineSweeperMedium, gated probe first | 2026-08-21 |
 
 Run any of them with no arguments to print the frozen predictions; pass a
 results file to score. `prereg_e10.py --check-clean <file>` verifies no data
@@ -67,6 +71,20 @@ python3 vendor/gleam/bias_stability.py --predict                # regenerate thr
 
 Every constant quoted in the manuscript maps to a generating file; the
 provenance table is in `paper/03-method.md`.
+
+### Reference fields in raw result rows
+
+Rows from continuous-environment runs carry `ref_*` fields copied verbatim
+from the per-instance baselines table frozen in `harness/gleam_instances.npz`.
+Two of them, `ref_k_AC` and `ref_J_AC`, are the aliased actor–critic
+equilibrium **at λ = 0** (`gleam_bench.GLEBench.ac_equilibrium`, the TD(0)
+result of Props 1–3) and are therefore constant across a file's λ grid — e.g.
+24.793797 in every `GLEAM_g1_h0.05` row. They are not the reference for the
+row's own λ and nothing is scored against them; the λ-dependent references
+live in the preregistration files (`prereg_e10.py`'s frozen `k_AC`/`J_AC`
+tables). The fields are kept, rather than dropped or renamed, so that every
+released row is byte-identical to the row its run wrote. Recorded when found
+in `provenance-node-class.md`.
 
 ## Author
 
