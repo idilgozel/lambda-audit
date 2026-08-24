@@ -1,0 +1,7 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00b-020.myriad.ucl.ac.uk
+task      : 61 -> config line 13, seed 4
+args      : --env MineSweeperMedium --arch gru128 --gae-lambda 0.99 --gamma 0.99 --total-timesteps 15000000 --results-name results_e12.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-21T17:59:55Z

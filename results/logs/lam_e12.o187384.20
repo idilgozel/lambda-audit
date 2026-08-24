@@ -1,0 +1,9 @@
+Loading pytorch/2.1.0/cpu
+  Loading requirement: gcc-libs/10.2.0 python/3.9.6-gnu-10.2.0
+host      : node-d00a-067.myriad.ucl.ac.uk
+task      : 20 -> config line 4, seed 2
+args      : --env MineSweeperMedium --arch mlp --gae-lambda 0.98 --gamma 0.99 --total-timesteps 15000000 --results-name results_e12.jsonl
+torch     : 2.1.0+cpu | numpy: 1.26.4
+starting  : 2026-08-21T17:59:25Z
+{"run": "MineSweeperMedium_mlp_lam0.98_s2", "env": "MineSweeperMedium", "arch": "mlp", "lam": 0.98, "seed": 2, "final_return": -0.16433928571428574, "deployed_return": -0.1775238095238096, "gap_value": -0.0055740780934944, "gap_lambda": 0.02034206821485275, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 2247.9}
+finished  : 2026-08-21T18:37:24Z
