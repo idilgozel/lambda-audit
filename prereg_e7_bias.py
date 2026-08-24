@@ -93,9 +93,40 @@ Usage:
     python3 prereg_e7_bias.py                     print the frozen predictions
     python3 prereg_e7_bias.py --check-clean F     refuse if E7 data exists in F
     python3 prereg_e7_bias.py --score F           score once E7 data exists
+
+AMENDMENT 1, 2026-08-21, POST-DATA, DISCLOSED. Scoring implemented late.
+------------------------------------------------------------------------
+The predictions above and the constants below were frozen on 2026-08-14 and
+have not been touched. What was missing is the SCORER: main() handled only
+--check-clean, so the --score flag this docstring advertised printed the
+prediction table and exited 0. P10.1, P10.2 and P10.3 were therefore reported
+in project documents from analysis performed outside this file, while every
+other preregistration in the project scores in-file. A pre-submission audit on
+2026-08-21 found it. score() below is that missing function, written after the
+data existed.
+
+This is the weakest link in the audit's chain and the paper must say so. The
+PREDICTIONS are prospective and dated; the code that reads them is not. The
+mitigations are that no constant in this file changed (verifiable in git from
+2026-08-21 onward, and against the values quoted in a5-tier2-bias-direction.md
+and e7-predata-two-thresholds.md, both written 2026-08-13/14), and that the
+scoring rule below is taken from conventions already frozen elsewhere rather
+than chosen now to fit the data.
+
+ONE RULE WAS GENUINELY UNDERSPECIFIED AT FREEZE and is fixed here, post-data:
+the file froze the per-RUN intermittency statistic (2 x J_ml, late half, 0.05)
+but never said how seeds combine into a CELL. This scorer takes the median over
+seeds, which is the aggregation used by prereg_phase2.py, prereg_e10.py and
+analysis/e8_intermittency.py (cell_medians) — i.e. the house convention, not a
+new choice. A sensitivity check over the alternatives (mean; any-seed;
+majority-of-seeds) is printed alongside every verdict so a reader can see
+whether the rule carries the result. If the verdicts move under a reasonable
+alternative, that is reported, not suppressed.
 """
+import csv
 import json
 import math
+import os
 import sys
 
 # ---------------------------------------------------------------------------
@@ -210,10 +241,218 @@ def check_clean(path):
     return 0
 
 
+# ---------------------------------------------------------------------------
+# SCORING. Amendment 1, 2026-08-21, post-data. See the docstring.
+# ---------------------------------------------------------------------------
+
+def _curve_path(results_path, env, arch, lam, seed):
+    d = os.path.dirname(os.path.abspath(results_path))
+    return os.path.join(d, f"curves_{env}_{arch}_lam{lam}_s{seed}.csv")
+
+
+def _costs(path):
+    """Cost through training. On GLEAM eval_return is -J_rate, so cost is its
+    negation. Same convention as analysis/e8_intermittency.py costs_of()."""
+    out = []
+    with open(path) as f:
+        for row in csv.DictReader(f):
+            v = row.get("eval_return", "")
+            if v not in ("", None):
+                out.append(-float(v))
+    return out
+
+
+def _run_intermittency(costs, j_ml):
+    """Fraction of LATE-half evaluation points costing more than 2 x J_ml.
+    Constants frozen 2026-08-14 above; identical to A-5 Tier 1b's, 2026-08-13."""
+    late = costs[int(len(costs) * LATE_FRACTION):]
+    if not late:
+        return float("nan")
+    return sum(1 for c in late
+               if c > INTERMITTENCY_COST_MULTIPLE * j_ml) / len(late)
+
+
+def _cells(results_path, env, j_ml, seeds=(1, 2, 3, 4, 5), arch="mlp"):
+    """lambda -> list of per-seed intermittency fractions. Missing curves are
+    omitted and reported by the caller rather than silently treated as zero;
+    a missing curve is not evidence of stability."""
+    out, missing = {}, []
+    for lam in GRID:
+        vals = []
+        for s in seeds:
+            p = _curve_path(results_path, env, arch, lam, s)
+            if not os.path.isfile(p):
+                missing.append(os.path.basename(p))
+                continue
+            vals.append(_run_intermittency(_costs(p), j_ml))
+        out[lam] = vals
+    return out, missing
+
+
+def _agg(vals, rule):
+    vals = [v for v in vals if v == v]          # drop NaN
+    if not vals:
+        return float("nan")
+    if rule == "median":
+        return sorted(vals)[len(vals) // 2] if len(vals) % 2 else \
+            0.5 * (sorted(vals)[len(vals) // 2 - 1] + sorted(vals)[len(vals) // 2])
+    if rule == "mean":
+        return sum(vals) / len(vals)
+    if rule == "any":                            # most permissive
+        return max(vals)
+    if rule == "majority":
+        f = sum(1 for v in vals if v > INTERMITTENCY_FRACTION) / len(vals)
+        return 1.0 if f > 0.5 else 0.0
+    raise ValueError(rule)
+
+
+def _onset_bracket(cells, rule):
+    """Adjacent grid pair straddling the intermittent -> stable transition.
+
+    Intermittency is predicted BELOW the threshold, so scanning upward in
+    lambda the last intermittent cell and the first stable cell above it
+    bracket the onset. Returns (lo, hi), or None if no cell is intermittent,
+    or ("NONMONOTONE", pairs) if the pattern switches more than once -- which
+    would mean the statistic is not measuring a single threshold and must not
+    be summarised as one.
+    """
+    flags = [(lam, _agg(cells[lam], rule) > INTERMITTENCY_FRACTION)
+             for lam in GRID if cells[lam]]
+    if not any(f for _, f in flags):
+        return None
+    switches = [i for i in range(len(flags) - 1)
+                if flags[i][1] and not flags[i + 1][1]]
+    if len(switches) != 1 or any(f for _, f in flags[switches[0] + 1:]):
+        return ("NONMONOTONE", [(l, f) for l, f in flags])
+    i = switches[0]
+    return (flags[i][0], flags[i + 1][0])
+
+
+def score(path, rule="median"):
+    _assert_frozen()
+    try:
+        import prereg_phase2 as P2
+    except Exception as exc:                      # pragma: no cover
+        raise SystemExit(f"cannot import frozen baselines: {exc}")
+
+    print(f"Frozen {GENERATED_ON}; scorer added 2026-08-21 (Amendment 1, "
+          f"post-data, disclosed in the docstring).")
+    print(f"Cell rule: {rule} over seeds. Run statistic: fraction of the late "
+          f"{LATE_FRACTION:.0%} of eval points\ncosting more than "
+          f"{INTERMITTENCY_COST_MULTIPLE} x J_ml; a cell is intermittent above "
+          f"{INTERMITTENCY_FRACTION}.\n")
+
+    measured, allmissing = {}, []
+    for name in PREDICTIONS:
+        j_ml = P2.BASELINES[name]["J_ml"]
+        cells, missing = _cells(path, name, j_ml)
+        allmissing += missing
+        measured[name] = (cells, _onset_bracket(cells, rule))
+
+    if allmissing:
+        print(f"MISSING {len(allmissing)} curve files. Curves are excluded by "
+              f".gitignore; see PROVENANCE.md section 4.")
+        print(f"  first few: {', '.join(allmissing[:3])}")
+        print("CANNOT SCORE P10 without them.\n")
+        return 2
+
+    print(f"{'instance':18}{'gh':>6}{'lam*':>10}{'predicted':>15}"
+          f"{'measured':>15}  P10.1")
+    v = {}
+    ok1 = True
+    for name, (gh, lh, ls, k, prosp) in PREDICTIONS.items():
+        pred = predicted_bracket(name)
+        cells, meas = measured[name]
+        if isinstance(meas, tuple) and meas and meas[0] == "NONMONOTONE":
+            hit, ms = False, "NON-MONOTONE"
+        elif ls is None:
+            hit = meas is None                    # g4: no onset anywhere
+            ms = "none" if meas is None else f"({meas[0]}, {meas[1]})"
+        elif meas is None:
+            hit, ms = False, "none"
+        else:
+            hit = meas[0] < ls <= meas[1]
+            ms = f"({meas[0]}, {meas[1]})"
+        ps = f"({pred[0]}, {pred[1]})" if pred else "none"
+        lss = f"{ls:.6f}" if ls is not None else "none"
+        tag = "ok" if hit else "MISS"
+        if not prosp:
+            tag += " (postdiction, no weight)"
+        else:
+            ok1 = ok1 and hit
+        print(f"{name:18}{gh:6.2f}{lss:>10}{ps:>15}{ms:>15}  {tag}")
+    v["P10.1"] = ok1
+    print(f"P10.1: {'PASS' if ok1 else 'FAIL'}  "
+          f"(prospective instances only: {', '.join(P101_APPLIES_TO)})\n")
+
+    # P10.2 ordering, over instances where an onset exists and is monotone.
+    pairs = []
+    for name, (gh, lh, ls, k, prosp) in PREDICTIONS.items():
+        meas = measured[name][1]
+        if isinstance(meas, tuple) and len(meas) == 2 and meas[0] != "NONMONOTONE":
+            pairs.append((gh, meas[1], name))     # upper edge locates the onset
+    pairs.sort()
+    ok2 = all(pairs[i][1] >= pairs[i + 1][1] for i in range(len(pairs) - 1))
+    for gh, up, name in pairs:
+        print(f"  P10.2 {name:18} gamma*h {gh:.2f}  measured onset <= {up}")
+    v["P10.2"] = ok2
+    print(f"P10.2: {'PASS' if ok2 else 'FAIL'}  (onset must fall as gamma*h rises)\n")
+
+    # P10.3 two thresholds: onset strictly below lambda_half, gap widens.
+    gaps, ok3 = [], True
+    for name, (gh, lh, ls, k, prosp) in PREDICTIONS.items():
+        meas = measured[name][1]
+        if not (isinstance(meas, tuple) and len(meas) == 2
+                and meas[0] != "NONMONOTONE"):
+            continue
+        below = meas[1] < lh
+        gap = lh - meas[1]
+        gaps.append((gh, gap, name))
+        ok3 = ok3 and below
+        print(f"  P10.3 {name:18} onset <= {meas[1]} vs lambda_half {lh:.6f}"
+              f"  gap {gap:+.6f}  predicted {P103_PREDICTED_GAPS.get(name, float('nan')):.6f}"
+              f"  {'below' if below else 'NOT BELOW'}")
+    gaps.sort()
+    widens = all(gaps[i][1] <= gaps[i + 1][1] for i in range(len(gaps) - 1))
+    v["P10.3"] = ok3 and widens
+    print(f"P10.3: {'PASS' if v['P10.3'] else 'FAIL'}  "
+          f"(strictly below: {ok3}; gap widens with gamma*h: {widens})\n")
+
+    # Sensitivity of every verdict to the one rule that was not frozen.
+    print("SENSITIVITY to the cell rule (the one choice made post-data):")
+    for alt in ("median", "mean", "any", "majority"):
+        brs = {n: _onset_bracket(measured[n][0], alt) for n in PREDICTIONS}
+        hits = []
+        for n in P101_APPLIES_TO:
+            ls = PREDICTIONS[n][2]
+            b = brs[n]
+            if isinstance(b, tuple) and b and b[0] == "NONMONOTONE":
+                hits.append(False)
+            elif ls is None:
+                hits.append(b is None)
+            else:
+                hits.append(bool(b) and b[0] < ls <= b[1])
+        print(f"  {alt:9} P10.1 {'PASS' if all(hits) else 'FAIL'}"
+              f"   brackets: " + "  ".join(
+                  f"{n.replace('GLEAM_','')}="
+                  + ("none" if brs[n] is None else
+                     "NONMONO" if brs[n][0] == 'NONMONOTONE' else
+                     f"({brs[n][0]},{brs[n][1]})")
+                  for n in PREDICTIONS))
+
+    print("\nVERDICTS:", {k: ('PASS' if b else 'FAIL') for k, b in v.items()})
+    return 0
+
+
 def main(argv):
     _assert_frozen()
     if len(argv) > 1 and argv[1] == "--check-clean":
         return check_clean(argv[2])
+    if len(argv) > 2 and argv[1] == "--score":
+        return score(argv[2])
+    if len(argv) > 1 and argv[1] == "--score":
+        raise SystemExit("--score needs a results file: "
+                         "python3 prereg_e7_bias.py --score <results.jsonl>")
     print(f"Frozen {GENERATED_ON}. Mechanism prediction for the E7 onset.\n")
     print(f"{'instance':18}{'gamma*h':>8}{'lam_half':>10}{'lam*':>10}"
           f"{'k_AC(lam*)':>11}  {'bracket':>14}  status")
