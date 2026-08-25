@@ -72,7 +72,8 @@ def instance_params(instance):
 class GleamNative:
     """Single environment, gym-like, matching the envs_native API."""
 
-    def __init__(self, instance, coupled=True, episode_len=None, seed=0):
+    def __init__(self, instance, coupled=True, episode_len=None, seed=0,
+                 nl=0.0):
         d = _load()
         if f"{instance}__F" not in d:
             raise KeyError(f"unknown GLEAM instance {instance}; "
@@ -93,6 +94,16 @@ class GleamNative:
         self.rng = np.random.default_rng(seed)
         self.s = None
         self.t = 0
+        # E13 (2026-08-21): optional cubic damping on the observed coordinate,
+        # applied AFTER the linear ZOH update in FOUR substeps:
+        #     for _ in range(4): v -= (h/4) * nl * v**3
+        # The substepping is part of the frozen map, not an implementation
+        # detail: the single-step version overflows at nl = 11.2 when |v|
+        # exceeds sqrt(2/(h*nl)) ~ 1.9, which exploration reaches; substepping
+        # doubles the threshold. Matches the pre-freeze pilot in
+        # prereg_e13.py exactly. nl = 0.0 takes no branch, draws no RNG, and
+        # changes no arithmetic, so every existing GLEAM row is untouched.
+        self.nl = float(nl)
 
     # -- gym-like API -------------------------------------------------------
 
@@ -112,6 +123,9 @@ class GleamNative:
             self.s = self.s @ self.F.T + np.outer(u, self.G[:, 0]) + noise
         else:
             self.s = self.s @ self.F.T + noise
+        if self.nl:
+            for _ in range(4):
+                self.s[:, 0] -= (self.h / 4) * self.nl * self.s[:, 0] ** 3
         self.t += 1
         trunc = self.t >= self.episode_len
         obs = self.s[:, 0:1].copy()[0]
@@ -124,7 +138,8 @@ class GleamNative:
 
     def __repr__(self):
         arm = "coupled" if self.coupled else "decoupled"
-        return f"GleamNative({self.instance}, {arm})"
+        tail = f", nl={self.nl}" if self.nl else ""
+        return f"GleamNative({self.instance}, {arm}{tail})"
 
 
 def _entry(instance, coupled):
@@ -146,9 +161,26 @@ REGISTRY = build_registry()
 
 
 def make(env_id):
-    if env_id not in REGISTRY:
-        raise KeyError(f"unknown GLEAM env {env_id}; known: {sorted(REGISTRY)}")
-    return REGISTRY[env_id]()
+    # E13: an optional trailing _nl<value> selects the cubic-damping variant,
+    # e.g. GLEAM_g1_h0.05_nl2.24. Parsed here rather than pre-registered
+    # because nl is a continuum; the base id must still be a known instance.
+    nl = 0.0
+    base = env_id
+    if "_nl" in env_id:
+        base, _, tail = env_id.rpartition("_nl")
+        try:
+            nl = float(tail)
+        except ValueError:
+            raise KeyError(f"bad nl suffix in {env_id!r}: {tail!r}")
+        if not (nl > 0):
+            raise KeyError(f"nl must be positive in {env_id!r}; for the "
+                           f"linear environment use the base id {base!r}")
+    if base not in REGISTRY:
+        raise KeyError(f"unknown GLEAM env {base}; known: {sorted(REGISTRY)}")
+    env = REGISTRY[base]()
+    if nl:
+        env.nl = float(nl)
+    return env
 
 
 if __name__ == "__main__":

@@ -71,6 +71,22 @@ def make_env(env_id):
     return gleam_native.make(env_id)
 
 
+def _valid_env(env_id):
+    """argparse validator: accept exactly the ids make_env can construct."""
+    import argparse as _ap
+    if env_id in ENV_REGISTRY:
+        return env_id
+    if gleam_native is not None and "_nl" in env_id:
+        try:
+            gleam_native.make(env_id)    # constructs and discards; no RNG use
+            return env_id
+        except KeyError as exc:
+            raise _ap.ArgumentTypeError(str(exc))
+    raise _ap.ArgumentTypeError(
+        f"unknown env {env_id!r}; known: {sorted(ENV_REGISTRY)} "
+        f"(plus GLEAM_*_nl<value> cubic-damping variants)")
+
+
 def is_continuous(space):
     return isinstance(space, envs_native.Box)
 
@@ -330,8 +346,20 @@ class Agent(nn.Module):
 
 def _continuous_env_id(env_id):
     """Dispatch without constructing an environment, so the discrete path is
-    provably untouched by the Phase 2 estimator."""
-    return gleam_native is not None and env_id in gleam_native.REGISTRY
+    provably untouched by the Phase 2 estimator.
+
+    E13 (2026-08-21): the cubic-damping variants (GLEAM_*_nl<value>) must
+    dispatch to the SAME continuing-trajectory estimator as their base
+    instance. Before this line, an _nl id silently fell through to the
+    episodic evaluator -- the estimator prereg_phase2.py's header documents
+    as inflating cost with the reset transient, confounded with the gain.
+    Caught by the pre-freeze smoke run (J_rate came back None); fixed by
+    stripping the suffix for dispatch only. Discrete ids never contain
+    "_nl", so their path is untouched."""
+    if gleam_native is None:
+        return False
+    base = env_id.rpartition("_nl")[0] if "_nl" in env_id else env_id
+    return base in gleam_native.REGISTRY
 
 
 @torch.no_grad()
@@ -542,8 +570,13 @@ def evaluate(agent, env_id, stack, episodes, seed, gamma, device,
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--env", type=str, default="RepeatPreviousMedium",
-                   choices=sorted(ENV_REGISTRY))
+    # E13 (2026-08-21): --env validation moved from a static choices= list to
+    # _valid_env, because the cubic-damping variants (GLEAM_*_nl<value>) are a
+    # continuum that cannot be enumerated. _valid_env accepts exactly what
+    # make_env can construct and nothing else; for every previously legal id
+    # the behaviour is identical, and an illegal id still dies at the parser
+    # with the known-env list. No RNG path is touched by this change.
+    p.add_argument("--env", type=_valid_env, default="RepeatPreviousMedium")
     p.add_argument("--arch", type=str, default="gru128",
                    choices=["mlp", "stack8", "stack64", "gru128", "linear", "linearb"])
     p.add_argument("--gae-lambda", type=float, default=0.95)
