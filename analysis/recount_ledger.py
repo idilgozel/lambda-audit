@@ -47,11 +47,13 @@ SCORERS = [
     ("prereg_e8.py",     ["--e11"], "results_e11.jsonl",         "E8 diagnostic"),
     ("prereg_e11.py",          [], "results_e11.jsonl",          "E11"),
     ("prereg_e12.py",          [], "results_e12.jsonl",          "E12"),
+    ("prereg_e13.py",          [], "results_e13.jsonl",          "E13"),
 ]
 
 # Capability gates. Everything else parsed out of a VERDICTS line is a
 # registered prediction.
-GATES = {"G1a", "G1b", "G1c", "G11a", "G11b", "G12a", "G12b", "G12c"}
+GATES = {"G1a", "G1b", "G1c", "G11a", "G11b", "G12a", "G12b", "G12c",
+         "G13"}
 
 VERDICT_RE = re.compile(r"^VERDICTS:\s*(\{.*\})\s*$", re.M)
 # prereg_e8.py reports P13.1 on its own line rather than in a VERDICTS dict.

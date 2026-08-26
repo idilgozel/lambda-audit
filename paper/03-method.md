@@ -205,21 +205,40 @@ per-node compilation.
 
 The claims are adjudicated by preregistration, and the preregistrations are
 **executable**: frozen constants and scoring functions live in Python files
-whose freeze is asserted mechanically — the deployment script runs each
+whose freeze is asserted mechanically — the deployment script runs every
 prereg as a pre-flight and refuses to submit if any sentinel remains — so a
 prediction cannot drift between freeze and verdict. Amendments are dated, and
 are made before the relevant data exists except where explicitly disclosed
-otherwise in the amendment text itself. Scoring refuses to run on data with
-duplicated cells. Verdicts are published as registered: this paper reports
-[N] registered failures alongside its passes, and two of its analyses
-(sections 6.x, 6.y) are labelled post-hoc and carry no confirmatory weight.
+otherwise in the amendment text itself. Scorers for the experiments whose
+results files accumulate across submissions (E6/E7/E9, E12, E13) refuse to
+run on data with duplicated cells; the E12 guard was added post-data after
+its grid re-ran the probe's two reference cells, an episode §6 reports along
+with the verdict-neutral separation. Two departures from the discipline are
+disclosed rather than smoothed over, because a pre-submission audit found
+them and an audit paper does not get to hide its own findings: the scoring
+code for P10.1–P10.3 was implemented after the data existed (the predictions
+and constants were frozen on 2026-08-14; the file's advertised `--score`
+mode was a stub until 2026-08-21, and the implemented scorer prints a
+sensitivity table over the one aggregation choice its freeze had left
+unspecified), and the diagnostic prereg (E8) lacked a mechanical freeze
+assertion until the same date. Verdicts are published as registered: this
+paper reports [N] registered failures alongside its passes, and two of its
+analyses (sections 6.x, 6.y) are labelled post-hoc and carry no confirmatory
+weight.
 Because cluster nodes of different CPU generations produce bit-different
 trajectories from identical seeds, the node class of every job is recorded
-and reported; within-class runs reproduce bitwise, and the one cross-class
-perturbation we measured is smaller than one seed standard deviation and
-moves no verdict [APPENDIX CROSS-REF]. Seeds are 1–5 for GLEAM experiments
-(1–3 for E10), matched across arms and architectures so that comparisons are
-paired at the seed level.
+and reported; within-class runs reproduce bitwise. Across classes we measured
+seven perturbed reruns: the largest difference is about 1.9 across-seed
+standard deviations, the typical one far below one, and substituting the
+affected values changes no registered verdict [APPENDIX CROSS-REF]. One
+comparison inherits a hardware caveat from this: E9 ran entirely within the
+d class while E6 and E7 both include t-class tasks, so P7.2 — an ordering
+test across instances — compares cells that were not all produced on
+bitwise-comparable hardware. P7.2 failed as registered, so no claim rests on
+it; the heterogeneity is recorded because it is part of what that comparison
+was. Seeds are 1–5 for GLEAM experiments (1–3 for E10 and E13), matched
+across arms and architectures so that comparisons are paired at the seed
+level.
 
 ## 3.7 Number provenance (drops to appendix or repo README at submission)
 
@@ -232,8 +251,9 @@ paired at the seed level.
 | eval inflation 1.088/1.270/2.415, calibration spread $1.6\times10^{-4}$ | `harness/test_eval_calibration.py`; prereg_phase2.py header note (dated 2026-08-12) |
 | bitwise env verification, 13,542 steps | `harness/test_env_equivalence.py` |
 | bitwise harness regression after linear/linearb | MEMO-arch-linear.md §6 (rows + curves, timing columns excluded) |
-| $k_{\text{AC}}(0)=24.79$, $k_{\text{AC}}(0.9)=20.55$, $k_{\text{ml}}=1.649$ on g1_h0.05 | `prereg_phase2.py` `K_AC_LAMBDA`, `BASELINES` |
-| intermittency definition ($2J_{\text{ml}}$, late half) | `a5-tier1b-findings.md` §1 (frozen 2026-08-13), reused unchanged in `prereg_e10.py` |
+| $k_{\text{AC}}(0)=24.79$ on g1_h0.05 (the TD(0) value; constant in every raw row as `ref_k_AC`) | `vendor/gleam/gleam_bench.py` (`ac_equilibrium`, Props 1–3); reproduced by `lstd_lambda.py` at $\lambda=0$ |
+| $k_{\text{AC}}(0.9)=20.55$, $k_{\text{ml}}=1.649$ on g1_h0.05 | `prereg_phase2.py` `K_AC_LAMBDA`, `BASELINES` |
+| intermittency definition ($2J_{\text{ml}}$, late half, 0.05 flag) | `a5-tier1b-findings.md` §1 (frozen 2026-08-13); constants carried in `prereg_e7_bias.py` (`INTERMITTENCY_*`, `LATE_FRACTION`) |
 
 <!-- TODO for section 5/6 integration:
   - [FIGURE: J(k_AC(lambda)) curves, four instances, lambda_half marked]

@@ -65,6 +65,22 @@ if [ -f "$ROOT/prereg_phase2.py" ]; then
     exit 1
   fi
 fi
+# 2026-08-21: prereg_e7_bias.py and prereg_e8.py were never run by any
+# deployment or collection script -- the only two preregs outside the
+# pre-flight, found by a pre-submission audit. Every prereg now ships through
+# the same gate.
+for prereg in prereg_e7_bias.py prereg_e8.py; do
+  if [ -f "$ROOT/$prereg" ]; then
+    if python3 "$ROOT/$prereg" >/dev/null 2>&1; then
+      echo "     ok  $prereg is frozen"
+    else
+      echo
+      echo "FATAL: $prereg is not frozen. Nothing shipped."
+      python3 "$ROOT/$prereg" 2>&1 | tail -5
+      exit 1
+    fi
+  fi
+done
 for f in "${FILES[@]}"; do
   p="$ROOT/$f"
   [ -e "$p" ] || die "missing locally: $f"

@@ -149,6 +149,28 @@ E11_SPEC_MLP_LAMS = [0.999, 1.0]
 E11_BOUNDARY = [0.99, 0.995]
 
 
+def _assert_frozen():
+    """Amendment 2, 2026-08-21, disclosed: this file was the ONLY prereg in
+    the project with no freeze assertion — found by a pre-submission audit,
+    not noticed at freeze time. The constants below were frozen 2026-08-18
+    (and the Amendment 1 values on the same date, disclosed there); this
+    check was written three days later. It cannot retroactively prove the
+    2026-08-18 freeze — PROVENANCE.md's cluster-log chronology does that —
+    but from today it makes this file refuse to score if any constant
+    drifts, which is the property every other prereg already had."""
+    ok = (FROZEN_ON == "2026-08-18"
+          and (MULT, SPLIT, FLAG) == (1.5, 0.5, 0.05)
+          and ABS_MULT == 2.0 and CHRONIC == 0.5
+          and E8_ARCHS == ("mlp", "stack8", "stack64", "gru128")
+          and MEMORYLESS_ARCHS == ("mlp", "stack8", "stack64")
+          and len(LAMBDAS) == 8 and len(KNEE) == 4 and len(J_ML) == 4
+          and E11_SPEC_MLP_LAMS == [0.999, 1.0]
+          and E11_BOUNDARY == [0.99, 0.995]
+          and abs(E11_KNEE - 0.99432) < 1e-9)
+    if not ok:
+        raise SystemExit("PREREG NOT FROZEN OR TAMPERED. Do not score.")
+
+
 def boundary_of(env):
     """Grid cells straddling the knee, excluded from labels per precedent."""
     k = KNEE[env]
@@ -291,6 +313,7 @@ def check_clean():
 
 
 if __name__ == "__main__":
+    _assert_frozen()
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
     if mode == "--develop": raise SystemExit(develop())
     if mode == "--e11": raise SystemExit(score_e11())

@@ -107,6 +107,14 @@ P15.3  THRESHOLD LOCATION. The mlp degradation onset bracket contains the
        multiple-comparison inflation were found by running this scorer on
        synthetic data drawn from the predicted pattern.
 
+AMENDMENT 2, 2026-08-21, POST-DATA, DISCLOSED. Scored thresholds unchanged.
+--------------------------------------------------------------------------
+score() now REFUSES files with duplicated (arch, lambda, seed) cells instead
+of silently absorbing them into the IQM. Motivated by an observed
+contamination, not a hypothetical: see the comment at the top of score().
+Verdict-neutral by construction (a clean file takes the same path as before,
+byte-identical output) and verified on the deduplicated grid.
+
 AMENDMENT 1, 2026-08-21, POST-DATA, DISCLOSED. Scored thresholds unchanged.
 --------------------------------------------------------------------------
 State when written: results_e12.jsonl held ONE row, the probe's mlp arm at
@@ -221,6 +229,32 @@ def check_clean(path):
 def score(path):
     _assert_frozen()
     rows = load(path)
+    # Amendment 2, 2026-08-21, post-data, disclosed: refuse duplicated cells.
+    # The 80-run grid re-ran the probe's two lambda=1.0 cells (the array's
+    # task numbering makes tasks 8 and 16 exactly the probe configs, and the
+    # harness appends), so the reference cell every prediction is measured
+    # against briefly carried seed 1 twice. The contamination was separated
+    # out by analysis/split_e12_probe.py (verdict-neutral: verdicts on the
+    # deduplicated file are identical; IQMs moved at the third decimal).
+    # This guard makes the scorer refuse rather than silently absorb a
+    # recurrence -- prereg_phase2.py has refused duplicates since its freeze,
+    # and E13 adopted the guard at birth; this file should have had it too.
+    # Tasks 61/62 (node failure) are being re-run into this same file, which
+    # is why the guard is added now rather than noted at release.
+    seen, dup = set(), []
+    for r in rows:
+        if r.get("env") != ENV:
+            continue
+        k = (r.get("arch"), round(float(r.get("lam", -1)), 6), r.get("seed"))
+        if k in seen:
+            dup.append(k)
+        seen.add(k)
+    if dup:
+        print(f"REFUSING TO SCORE: {len(dup)} duplicated (arch, lambda, seed)"
+              f" cells, e.g. {dup[0]}.")
+        print("Run analysis/split_e12_probe.py (probe rows) or separate the "
+              "extra rows; do not score a file that double-counts a seed.")
+        return 2
     m1, g1 = cell(rows, "mlp", REF_LAM), cell(rows, "gru128", REF_LAM)
     if not m1 or not g1:
         print("MISSING lambda=1.0 cells; cannot score gates."); return 2
