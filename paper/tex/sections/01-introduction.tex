@@ -1,0 +1,99 @@
+% ---------------------------------------------------------------------------
+% Section 1: Introduction. Rewritten from scratch 2026-09-11 (Day 3).
+% Replaces paper/01-intro-arc.md (2,304 words, chronological, stale ledger).
+% Theory-first. The chronology of the audit is one sentence here and lives in
+% the appendix. Every number is quoted from a frozen scorer's output.
+% ---------------------------------------------------------------------------
+
+\section{Introduction}
+\label{sec:intro}
+
+When a recurrent agent outperforms a memoryless one on a partially observed
+task, the result is read as evidence about \emph{memory}: the task needed it
+and the architecture supplied it. Most of what is known about memory in deep
+reinforcement learning rests on comparisons of this shape. Both agents in such
+a comparison are usually trained with an actor--critic method whose advantage
+estimator, GAE($\lambda$) \citep{schulman2016gae}, bootstraps the critic over
+an effective horizon of $(1-\gamma\lambda)^{-1}$ steps. Under partial
+observability the critic is a function of the observation alone, so it is
+biased wherever the observation aliases states with different futures --- and
+the horizon sets how much of that bias the policy gradient inherits. The
+horizon is set by $\lambda$, a hyperparameter chosen by convention (0.95 in
+most codebases, 1.0 in the POPGym reference results \citep{morad2023popgym})
+and rarely varied in memory studies. The quantity it interacts with is the
+correlation time of the hidden state, which is exactly what a memory benchmark
+manipulates.
+
+This paper makes that interaction exact. In a family of partially observed
+linear-Gaussian control problems with quadratic cost, the fixed point of the
+averaged actor--critic update under an observation-restricted TD($\lambda$)
+critic is computable in closed form (\S\ref{sec:theory}). On the reference
+instance it moves from a gain of $24.79$ at $\lambda=0$ to $1.51$ at
+$\lambda=1$, against a true memoryless optimum of $1.649$: the learning target
+of the ``memoryless baseline'' is displaced by an order of magnitude under a
+hyperparameter that is rarely reported to two decimals, and the displacement
+is away from the optimum. The excess cost this induces collapses at a
+computable threshold $\lambda_{1/2}$, and that threshold is the paper's central
+empirical result: frozen before the runs, it is hit within $0.01$ on all four
+instances tested, with absolute errors of $0.00021$, $0.00014$, $0.00101$ and
+$0.00497$ (\S\ref{sec:results}).
+
+Two further results say when this matters and when it does not. A
+\emph{scope proposition} (\S\ref{sec:theory}) shows that when actions do not
+influence the hidden state the critic's bias cancels identically from every
+action preference at every $\lambda$; the effect requires a hidden coordinate
+the action can \emph{steer}. Both sides of that boundary are confirmed on
+external benchmarks under one harness: on position-only CartPole, where the
+condition holds, all three registered predictions pass (memoryless
+performance steps down below the horizon by $-0.021$, 95\% CI
+$[-0.029,-0.014]$, with no step above it); on two POPGym games where the
+latent is fixed at reset and actions only reveal it, the predicted effect is
+absent, with the measured memory advantage at $\lambda=0.95$ \emph{smaller}
+than at $\lambda=1.0$. And the threshold is not an artifact of the minimal
+instance: the same structure appears at state dimensions 2--4 for arbitrary
+Prony memory kernels, and it survives a cubic damping the theory cannot
+absorb --- at a perturbation that moves the floor cost by $2.5\times$, the
+linearized theory still locates $\lambda_{1/2}$ within $0.0017$
+(\S\ref{sec:results}). Thresholds and cost levels are robust across
+dimension, nonlinearity and drive distribution; equilibrium \emph{locations}
+are not, and that split predicts which of the paper's own predictions passed.
+
+A second threshold is derived from the same machinery: an off-manifold
+stability index whose destabilising term carries the bootstrap weight
+$(1-\lambda)/\lambda$ itself, predicting that below a critical $\lambda^\ast$
+training does not converge and its measured quality depends on when it is
+stopped. Its experimental record is mixed --- the onset ordering and the
+unstable side of a perturbation-decay test pass, the location and the stable
+side miss their registered thresholds --- and a rule fixed before the data
+existed demotes it to a suggestive calculation. We report it as such.
+
+\paragraph{Method.} Every claim above was frozen as an executable
+preregistration --- constants and scoring functions in a Python file whose
+freeze is machine-checked at deployment and which refuses to score data that
+already existed when it was frozen --- before the data that tests it existed.
+Twenty-five predictions were registered; eleven passed, fourteen failed, and
+every one is reported (Table~\ref{tab:ledger}). Most of the failures are the
+scope proposition doing its job on the wrong side of its boundary, or a
+location prediction the theory itself marks as fragile; three are genuine
+misses of the mechanism claim, handled by the rule above. Capability gates are
+reported separately in both directions, because a failed gate means a
+prediction was not scored, not that it was refuted. The preregistration is
+how the theory was tested, not what the paper claims; the audit's history,
+including the two experiments whose design errors we own, is in the appendix.
+
+\paragraph{Contributions.}
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
+\item \textbf{The confound, made exact.} A closed-form aliased equilibrium
+  map $k_{\mathrm{AC}}(\lambda)$, its cost law, and a threshold
+  $\lambda_{1/2}$ predicted prospectively within $0.01$ at four instances.
+\item \textbf{A scope law with evidence on both sides.} A proposition stating
+  where the effect is absent, confirmed in-domain by a decoupled control arm
+  and externally by one benchmark where it appears and two where it does not.
+\item \textbf{Generality of the thresholds.} Kernel- and dimension-general
+  formulas; robustness to a 50\% nonlinear perturbation; and a robust/fragile
+  split --- cost and thresholds versus equilibrium location --- that
+  organises the results.
+\item \textbf{The audit as an artifact.} Executable preregistrations with
+  machine-checked freezes, disclosed amendments, a released diagnostic, and a
+  ledger of every registered outcome, released with the testbed and harness.
+\end{enumerate}

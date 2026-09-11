@@ -1,0 +1,64 @@
+% Appendix B: material compressed out of Section 4 on Day 4 (2026-09-12). Verbatim.
+\section{Results: full detail}
+\label{app:results}
+
+\subsection{E12 and the out-of-scope externals}
+\label{app:e12}
+\textbf{External, scope condition not met.} Two POPGym game environments
+were tested and neither shows the effect. On BattleshipEasy the
+capability gates failed outright (memoryless and memory arms both at the
+floor, \(-0.441\) and \(-0.446\)), so P12.1--P12.3 are \emph{not
+scored}. On MineSweeperMedium the gates passed convincingly --- our
+memoryless arm reproduces POPGym's published MLP score to 0.012, and the
+memory advantage at \(\lambda = 1.0\) is \(+0.121\) --- and all three
+registered predictions then failed: the measured advantage at the
+community default \(\lambda = 0.95\) is \(+0.091\), \emph{smaller} than
+at \(\lambda = 1.0\), the opposite of the registered direction (P15.1),
+and no threshold structure appears at the computed knee (P15.3).
+
+We registered these as positive predictions and they failed as
+registered. The reading, which the scope law itself supplies: in both
+environments the latent state is fixed at reset and actions reveal
+information about it rather than steering it, so the mechanism has no
+equilibrium to displace. That distinction --- actions steering the
+latent versus actions revealing it --- was not in our claim set when E12
+was designed, and the $\tau$ used to place the knee was an episode length
+rather than a relaxation time of a mean-reverting coordinate. Both are
+our errors, and they are why P15 is reported as three failures rather
+than reinterpreted. What survives is a boundary with evidence on both
+sides of it: the effect appears where the theory says it should
+(P9.1--P9.3) and is absent where the theory says it should be (G2,
+P15.1--P15.3), on external benchmarks, under the same harness.
+
+Independently, the released diagnostic (\S5.6) finds no trace of the
+mechanism's signature in E12's training curves: memoryless-arm
+excursions are at noise level and flat across \(\lambda\) (1, 0, 1
+flagged runs of 5 below the knee against 2, 1, 1, 0, 1 above), rather
+than concentrated below it. The instrument reports the effect absent,
+not swamped.
+
+
+\subsection{Mechanism misses and the E10 drift decomposition}
+\label{app:mechanism}\label{app:drift}
+Two observations bound what the demotion means, and neither is offered
+as a rescue. The three P11.4 misses are the three scored cells with the
+smallest positive \(S\) (\(+2.3\), \(+6.0\) and
+\(+4.4 \times 10^{-4}\)), each adjacent to its instance's knee; and
+resolvability is asymmetric at this budget --- growth resolved down to
+\(|S| = 1.3\times10^{-4}\) while decay resolved only at
+\(S \geq 1.1\times10^{-2}\), with perfect separation between the groups.
+The registered floor was calibrated on a growth cell and applied
+symmetrically, which is a design error we would not repeat. The minimal
+reading of the three misses is ``unresolved at budget''; a genuine sign
+error at \(|S| < 10^{-3}\) cannot be excluded on these data.
+
+Separately, P11.1 and P11.2 failed: 19 of 32 cells drifted outside the
+15\% gain tolerance. The decomposition is verified and reported in \S6
+--- all 96 runs drifted downward (systematic, not diffusive), the
+analytic cost map holds to \(\leq 1.05\%\) at every measured gain
+including all failing cells, and failure aligns with the branch of the
+equilibrium map rather than with \(\lambda\). P11.3 is estimated from
+the shape of that intact cost profile, which is why it survives what
+P11.1 and P11.2 did not.
+
+

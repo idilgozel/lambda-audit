@@ -1,0 +1,93 @@
+\section{An exactly solvable testbed for the bootstrap horizon}
+\label{sec:testbed}
+
+The audit needs a setting in which the equilibrium the learner is pulled
+toward, the cost of sitting there, and the threshold at which learning stops
+arriving are all computable exactly, so that a failed prediction indicts the
+theory rather than the baseline. We use the smallest such setting that still
+contains the phenomenon.
+
+\subsection{Model and instances}
+
+The state $s=(v,z)\in\mathbb{R}^2$ is a damped oscillator driven by noise,
+\begin{equation}
+\dot s = A s + B u + \xi, \qquad
+A = \begin{pmatrix} 0 & 1 \\ -c & -\gamma \end{pmatrix}, \quad
+B = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \quad
+\mathbb{E}[\xi \xi^\top] = \mathrm{diag}(0,\, 2\Theta\gamma c),
+\label{eq:model}
+\end{equation}
+discretised by exact zero-order hold at step $h$ ($F=e^{Ah}$, $G$ and
+$\Sigma_d$ by quadrature to machine precision). The agent observes
+\textbf{only} $v$; $z$ is hidden. Cost is $h(qv^2+ru^2)$, $q=r=1$, discounted
+at $\beta=e^{-\rho h}$, $\rho=0.05$; $\Theta=1$, $c=0.3$. Exploration is a
+pinned Gaussian on the action, $\sigma_e=0.3$, held fixed rather than learned
+so that entropy collapse cannot act as an uncontrolled brake on the
+$\lambda$ reading. The GLE form generalises to Prony kernels
+$K(\tau)=\sum_i c_i e^{-\gamma_i\tau}$ (\S\ref{sec:theory}); the experiments
+use the single-mode member.
+
+Two timescales organise everything: the hidden coordinate decorrelates over
+$\tau_z\approx 1/(\gamma h)$ steps, and GAE($\lambda$) bootstraps over
+$(1-\beta\lambda)^{-1}$ steps. Their ratio is controlled through the single
+product $\gamma h$, instantiated at $0.02, 0.05, 0.10, 0.20$
+(instances g1\_h0.02, g1\_h0.05, g2\_h0.05, g4\_h0.05), so every predicted
+threshold moves monotonically across the family and each prediction is tested
+at four locations.
+
+\subsection{Two arms: the effect's scope is part of the design}
+
+``Memory helps'' and ``the critic's bias distorts learning'' are usually
+observationally identical. They separate here because the critic's bias can
+reach the policy through only one door: the expected advantage of action $a$
+at $v$ depends on $\hat V$ only through $\mathbb{E}[\hat V(v_{t+1})\mid v_t,a]$
+(\S\ref{sec:theory}, Proposition~1). Every in-domain experiment therefore runs
+on a \textbf{coupled} arm, where $u$ steers the state, and a \textbf{decoupled}
+arm, identical except that $u$ enters the cost and not the dynamics, so the
+optimal gain is $0$ and the cancellation applies exactly. An effect present on
+the coupled arm and absent on the decoupled one is attributed to the learning
+channel rather than to representation, optimisation or capacity, which the
+arms share. Every reference quantity the experiments compare against is
+derived in \S\ref{sec:theory} and generated, not typed.
+
+\subsection{Harness and measurement}
+
+All experiments use one single-file PPO harness \citep{schulman2017ppo}
+(GAE($\lambda$), clip 0.2, 4 epochs, 16 environments, 128-step rollouts,
+15M steps; discount equal to the model's $\beta$), differing only in the policy
+head: \textbf{mlp}, \textbf{gru128}, and two restricted heads that exist for
+identification --- \textbf{linear} ($u=-kv$, which cannot leave the gain
+manifold) and \textbf{linearb} ($u=-kv+b$, adding exactly the one escape
+direction the theory computes). Both restricted heads can be initialised at a
+chosen gain, and linearb can kick $b$ to $b_0$ at $t=0$, turning stability
+claims into perturbation-decay measurements. Adding them left the mlp and
+gru128 paths bitwise identical (Appendix~\ref{app:testbed}).
+
+Deployed cost is measured with the policy mean on a single $200{,}000$-step
+trajectory after burn-in. The obvious alternative, averaging short episodes,
+would have manufactured a registered result: each reset pays the settling
+transient, and the inflation grows with the gain (factors $1.088$, $1.270$,
+$2.415$ at $k=1.65$, $5.99$, $20.55$), i.e.\ it is largest exactly where the
+predicted effect is. Every continuous run also reports its \textbf{fitted
+gain} (OLS slope of $u$ on $v$) and an \textbf{intermittency fraction} (share
+of late-training evaluations costing more than $2J_{\mathrm{ml}}$), which
+detects recurrent excursions without reference to any prediction. External
+benchmarks are POPGym environments reimplemented natively with the upstream
+seeding path reproduced and verified bitwise against the reference
+implementation before any run.
+
+\subsection{Audit protocol}
+
+Claims are adjudicated by \emph{executable} preregistration: frozen constants
+and scoring functions in a Python file whose freeze is machine-checked at
+deployment and which refuses to certify a freeze if data for that experiment
+already exist. Amendments are dated and disclosed in the file that carries
+them; post-data amendments are labelled as such. Scorers for experiments whose
+result files accumulate across submissions refuse duplicated cells; capability
+gates are scored before predictions and a failed gate leaves its predictions
+\emph{not scored}. Node class is recorded for every cluster job because CPU
+generations are not bitwise comparable; the largest cross-class perturbation
+we measured is $1.9$ seed standard deviations and moves no verdict. Two
+departures from this discipline were found by a pre-submission audit and are
+disclosed in \S\ref{sec:discussion}. Full protocol, harness settings and the
+number-provenance table are in Appendix~\ref{app:testbed}.

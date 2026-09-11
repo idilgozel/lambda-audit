@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
+
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{proposition}{Proposition}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{calc}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% ---------------------------------------------------------------------------
+% Uncomment ONLY for the camera-ready. Leaving it commented keeps the
+% submission anonymous; a non-anonymous submission is desk rejected.
+% \iclrfinalcopy
+% ---------------------------------------------------------------------------
+
+\title{The Bootstrap Horizon: \\ An Audited Account of How GAE($\lambda$)
+Moves the Memoryless Baseline}
+
+\author{Anonymous Author(s) \\
+Affiliation \\
+Address \\
+\texttt{email}}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+% ~200 words. Written Day 8 (17 Sept), once the body is final.
+% Placeholder sized to the target so the page count is honest.
+\textbf{[ABSTRACT --- Day 8.]}
+Placeholder text sized to approximately two hundred words so that the page
+count reported by this build reflects the intended final length rather than
+an empty slot. The abstract states the confound, the exact result, the scope
+boundary, and the audit protocol, in that order. It names the quantity that
+moves, gives the magnitude of the displacement on the reference instance,
+states that the threshold location is predicted to within one part in a
+thousand at four instances prospectively, and states the scope condition
+under which the effect appears and vanishes. It closes with the
+preregistration as method rather than as claim. The final sentence gives the
+release. This paragraph is deliberately verbose in order to occupy the space
+the real abstract will occupy, and will be replaced in full. It should not be
+read as content. It exists so that every compression decision taken between
+now and the deadline is measured against a page count that includes every
+component of the finished paper, including the ones not yet written, which is
+the only way to know whether the paper fits.
+\end{abstract}
+
+% ===========================================================================
+\input{sections/01-introduction}
+% ===========================================================================
+\input{sections/02-testbed}
+% ===========================================================================
+\input{sections/03-theory}
+% ===========================================================================
+\input{sections/04-results}
+% ===========================================================================
+\input{sections/05-discussion}
+% ===========================================================================
+\input{sections/06-related}
+% ===========================================================================
+
+\subsubsection*{Use of AI}
+% MANDATORY under the ICLR 2027 AI Policy for Authors. Does NOT count toward
+% the page limit. Also declared on the submission form. Written Day 6.
+\textbf{[AI-USE STATEMENT --- Day 6. Off page-budget.]}
+
+\bibliography{refs}
+\bibliographystyle{iclr2027_conference}
+
+\appendix
+\input{sections/A1-testbed-details}
+\input{sections/A2-results-details}
+\section{Derivations}
+\label{app:theory}
+\textbf{[APPENDICES --- Days 9--10.]}
+
+\end{document}

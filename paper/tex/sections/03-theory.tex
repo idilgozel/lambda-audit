@@ -1,0 +1,164 @@
+% ---------------------------------------------------------------------------
+% Section 3: Theory. Draft v1, 2026-09-11 (Day 2).
+%
+% Every displayed equation is annotated with the file that generates the
+% corresponding number. DAY 11 VERIFICATION: re-check each annotated line
+% against vendor/gleam/{theorem2_learning,lstd_lambda,bias_stability,
+% kernel_general}.py and prereg_e7_bias.py before submission. The formulas
+% here were transcribed from the frozen prereg_e7_bias.py docstring (S index)
+% and from kernel_general.py (critic, gradient), which reproduces the frozen
+% prereg_e10.py tables to relative 6e-7 at all eight grid points.
+%
+% This section absorbs what were sections 2.3 and 2.4 in the earlier draft.
+% ---------------------------------------------------------------------------
+
+\section{Theory: the aliased equilibrium map and two thresholds}
+\label{sec:theory}
+
+Everything the experiments test is a closed-form consequence of the model of
+\S\ref{sec:testbed} under one restriction: the critic sees only $v$. For a
+linear policy $u=-kv$ the closed loop $F_k$ has stationary covariance
+$\Sigma(k)$ from a discrete Lyapunov equation and deployed cost
+$J(k)=(q+rk^2)\Sigma_{11}(k)$; from it, the best memoryless gain
+$k_{\mathrm{ml}}=\arg\min_k J$, the full-state optimum $J^\ast$ (Riccati),
+and the large-gain plateau $J\to r\Theta K(0)$. Derivations are in
+Appendix~\ref{app:theory}; the generators are released.
+% generator: theorem2_learning.J_deploy; gleam_bench.J_gain
+
+\subsection{The aliased critic}
+
+A critic restricted to the observation is $\hat V(v) = \theta_0 + \theta_1 v +
+\theta_2 v^2$ with $\phi = (1, v, v^2)$. Its LSTD($\lambda$) fixed point solves
+$A\theta = b$ with
+\begin{equation}
+A = \sum_{j\ge 0} (\beta\lambda)^j\,\mathbb{E}\!\left[\phi_{t-j}\,(\phi_t - \beta\phi_{t+1})^\top\right],
+\qquad
+b = \sum_{j\ge 0} (\beta\lambda)^j\,\mathbb{E}\!\left[\phi_{t-j}\, c_t\right].
+\label{eq:lstd}
+\end{equation}
+% generator: lstd_lambda.lstd_lambda_theta2; kernel_general.theta2
+By parity $\theta_1 = 0$, and with $x_j := e_1^\top F_k^{\,j}\,\Sigma\, e_1$
+the lag-$j$ autocovariance of $v$, the curvature coefficient is
+\begin{equation}
+\theta_2(\lambda,k) \;=\; \frac{h\,(q + r k^2)\,\sum_{j\ge 0} (\beta\lambda)^j x_j^2}
+{\sum_{j\ge 0} (\beta\lambda)^j\,\bigl(x_j^2 - \beta\, x_{j+1}^2\bigr)}.
+\label{eq:theta2}
+\end{equation}
+This is the whole source of the confound. The critic is fed the persistence of
+$v^2$ across lags, which under aliasing is the hidden bath's persistence
+wearing the observation's clothes; the bootstrap weight $(\beta\lambda)^j$
+decides how many lags it is allowed to see.
+
+\subsection{The equilibrium map}
+
+For the exploring policy $u = -kv + \eta$, $\eta\sim\mathcal N(0,\sigma_e^2)$,
+the expected GAE($\lambda$) policy gradient with score
+$s_t = -v_t\eta_t/\sigma_e^2$ is
+\begin{equation}
+\hat g(k;\lambda) \;=\; \mathbb{E}\Bigl[\, s_t \sum_{j\ge 0} (\beta\lambda)^j\,\delta_{t+j} \Bigr],
+\qquad
+\delta_t = c_t + \beta \hat V(v_{t+1}) - \hat V(v_t).
+\label{eq:ghat}
+\end{equation}
+% generator: lstd_lambda.gae_gradient; kernel_general.ghat
+Because the closed loop is Gaussian, every term is an Isserlis sum of lag
+moments, and the infinite bootstrap series collapse to matrix resolvents ---
+$\sum_j (\beta\lambda)^j x_j = e_1^\top (I - \beta\lambda F_k)^{-1}\Sigma e_1$,
+and its quadratic analogue through $F_k\!\otimes\!F_k$ --- with no truncation
+anywhere (Appendix~\ref{app:theory}). The \emph{aliased equilibrium map}
+\begin{equation}
+k_{\mathrm{AC}}(\lambda) \;:=\; \text{the largest root of } \hat g(\,\cdot\,;\lambda)
+\label{eq:kAC}
+\end{equation}
+is the fixed point of the averaged actor--critic update. We say fixed point
+rather than limit: whether training arrives there is one of the things the
+experiments measure. At $\lambda = 0$ every $j\ge1$ term vanishes and
+\eqref{eq:theta2}--\eqref{eq:kAC} reduce to the TD(0) closed form of the
+companion derivation. On the reference instance $k_{\mathrm{AC}}$ runs from
+$24.79$ at $\lambda=0$ to $1.507$ at $\lambda=1$, against
+$k_{\mathrm{ml}} = 1.649$: the learning target of the memoryless baseline moves
+by an order of magnitude under a hyperparameter that is rarely reported to two
+decimals, and it moves \emph{away} from the true memoryless optimum as the
+horizon shortens.
+% numbers: prereg_e10.py C["GLEAM_g1_h0.05"]; gleam_bench.ac_equilibrium (lambda=0)
+
+\subsection{The cost law and its threshold}
+
+The learner's excess cost is $E(\lambda) := J(k_{\mathrm{AC}}(\lambda))/J_{\mathrm{ml}}$.
+It sits on a plateau near $r\Theta K(0)/J_{\mathrm{ml}}$ while the bootstrap
+horizon $(1-\beta\lambda)^{-1}$ is short against the bath's correlation time,
+and collapses to $1$ once the horizon exceeds it. The \emph{cost-law threshold}
+$\lambda_{1/2}$ is where $E$ has fallen halfway from plateau to floor. On the
+four instances it is $0.9966, 0.9854, 0.9580, 0.8731$ for
+$\gamma h = 0.02, 0.05, 0.10, 0.20$ --- monotone in the ratio of horizon to
+correlation time, as it must be. Because experiments sample $\lambda$ on an
+eight-point grid we also freeze the \emph{grid-matched} value --- the same
+midpoint estimator applied to the exact $E$ on that grid --- so measurement
+error and interpolation bias are never conflated; and the estimator is
+invariant under scaling and shifting the profile, so it needs no reference
+value (\S\ref{sec:results}).
+% numbers: prereg_phase2.LAMBDA_HALF; prereg_e10.py GRID_LAMBDA_HALF
+
+\subsection{Off-manifold stability and the second threshold}
+
+Whether training can hold $k_{\mathrm{AC}}$ is a separate question from where
+it is. Give the policy one direction off the gain manifold, $u = -kv + b$. By
+parity $b=0$ is a fixed point of the averaged update for $b$; its stability is
+exact. With $\mu_v = e_1^\top(I - F_k)^{-1}G$,
+$\alpha = q\mu_v - kr(1 - k\mu_v)$,
+$\Phi = \beta\lambda\, e_1^\top (I - \beta\lambda F_k)^{-1} G$,
+$X = \sum_l (\beta\lambda)^l x_l$, $X_1 = \sum_l (\beta\lambda)^l x_{l+1}$, and
+$\kappa = 2h\alpha X/(X - \beta X_1)$,
+\begin{equation}
+S(\lambda,k) \;=\; 2hr\,(1 - k\mu_v) \;+\; 2h\alpha\,\Phi \;+\; \kappa\,\Phi\,\frac{1-\lambda}{\lambda},
+\qquad
+\frac{\partial \hat g_b}{\partial b}\Big|_{b=0} = -S,
+\label{eq:S}
+\end{equation}
+% generator: bias_stability.bias_stability; frozen in prereg_e7_bias.py
+so $b=0$ is stable iff $S>0$. The first two terms are the direct restoring
+force. The third is the aliased critic's contribution, and it carries the
+factor $(1-\lambda)/\lambda$ --- the bootstrap weight itself. It vanishes at
+$\lambda=1$ and grows without bound as $\lambda$ falls; below a critical value
+it overwhelms the restoring terms and the policy leaves the manifold. The
+\emph{stability threshold} $\lambda^\ast$ is the sign change of
+$S(\lambda, k_{\mathrm{AC}}(\lambda))$: $0.9956, 0.9759, 0.9010$ on the first
+three instances and no crossing on the fourth, where the equilibrium is stable
+at every $\lambda$. Below $\lambda^\ast$ the theory predicts that training does
+not converge and its measured quality depends on when it is stopped. The closed form agrees with a Monte Carlo central difference of
+$\mathbb{E}[\hat g_b]$ (critic refit at each $b$) within 1--3\% at ten points
+spanning both signs of $S$ and three instances.
+% numbers: prereg_e7_bias.PREDICTIONS; MC table in prereg_e7_bias.py docstring
+
+\subsection{Scope}
+
+\begin{proposition}[Scope]
+If the transition law of the hidden state does not depend on the action, then
+for every $\lambda$ and every observation-restricted critic $\hat V$, the
+critic's bias cancels identically from the expected policy gradient.
+\end{proposition}
+\emph{Proof.} The advantage is built from
+$\delta_t = c_t + \beta\hat V(o_{t+1}) - \hat V(o_t)$, and the action enters
+the expected advantage of $a$ at $o_t$ only through
+$\mathbb{E}[\hat V(o_{t+1})\mid o_t, a]$. If transitions are
+action-independent this term is the same for every $a$, so it is a baseline
+and drops from every action preference.~$\square$
+
+The proposition says where the confound is \emph{absent}. Displacing an
+equilibrium needs more than non-cancellation: it needs a hidden coordinate the
+action can \emph{steer}. Environments where actions merely \emph{reveal} a
+frozen latent satisfy neither hypothesis, and the theory makes no prediction
+for them. \S\ref{sec:results} tests both sides.
+
+\subsection{What is a property of the family and what is not}
+
+None of the formulas above uses the state dimension: they hold for any Prony
+kernel $K(\tau)=\sum_i c_i e^{-\gamma_i\tau}$, and \S\ref{sec:results}
+recomputes them at dimensions 2--4. Two things do \emph{not} carry across
+kernel shapes --- a single timescale ordering $\lambda_{1/2}$, and the ordering
+$\lambda^\ast<\lambda_{1/2}$ --- and we report both. The companion derivation
+adds that, at matched autocovariance, the equilibrium \emph{location} moves
+$3.4\times$ across Gaussian, bounded and kurtotic drives while the \emph{cost}
+at equilibrium stays within 1--7\%: thresholds and cost levels are robust,
+locations are fragile. That split predicts this paper's own ledger.
+% numbers: kernel-generality-findings.md; GLEAM lemma-a-findings.md

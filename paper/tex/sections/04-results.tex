@@ -1,0 +1,242 @@
+\section{Results}
+\label{sec:results}
+
+We report every registered prediction. Of 25 scored, 11 passed and 14
+failed; capability gates are tallied separately (7 passed, 2 failed)
+because a failed gate means the predictions behind it are \emph{not
+scored} rather than refuted. The ledger is Table 3. The failures are not
+incidental to the results --- three of them are the mechanism by which
+the paper's scope claim is tested, and the one that cost the most
+produced the paper's strongest prediction.
+
+\subsection{The confound, made
+exact}
+
+On the reference instance the aliased equilibrium map runs from
+\(k_{\text{AC}} = 24.79\) at \(\lambda = 0\) to \(1.51\) at
+\(\lambda = 1\), against a best memoryless gain of
+\(k_{\text{ml}} = 1.649\): the learning target of the memoryless
+baseline moves by an order of magnitude under a hyperparameter that is
+rarely reported to two decimals. The map is a closed-form root of the
+exact expected GAE(\(\lambda\)) gradient, not a fit.
+
+The learned agent's cost follows. On the coupled arm, cost at
+\(\lambda = 0.9\) exceeds cost at \(\lambda = 1.0\) by \(2.63\times\)
+(P6.2, registered threshold \(1.25\times\)), and at \(\lambda = 1.0\)
+the learned gain lands at \(1.663\) against \(k_{\text{ml}} = 1.649\)
+--- the memoryless baseline is only the \emph{best} memoryless policy at
+the top of the \(\lambda\) range.
+
+One registered prediction about \emph{location} failed here and reshaped
+the rest of the paper. P6.1 required the learned gain to land at
+\(k_{\text{AC}}(\lambda)\) below the horizon; at
+\(\lambda \in \{0.8, 0.95\}\) it landed nearer \(k_{\text{ml}}\), and
+cost missed its 15\% band by 96--425\%. Training does not \emph{arrive}
+at the computed fixed point below the horizon. That failure separated
+two questions the design had conflated --- where the equilibrium is, and
+whether training reaches it --- and forced the second threshold (\S3.4)
+into the theory.
+
+\subsection{The cost law, tested
+prospectively}
+
+E7 tested the quantitative law by locating \(\lambda_{1/2}\) from
+trained agents across four instances. All three predictions failed:
+\(\lambda_{1/2}\) within 0.01 on 1 of 4 instances (P7.1), the ordering
+in \(\gamma h\) broken (P7.2), the below-knee plateau within 10\% on 1
+of 4 (P7.3).
+
+The diagnosis, performed on the landed data and labelled post-hoc: the
+registered estimator conflated the cost law \(J(k)\) with the assumption
+that training arrives at \(k_{\text{AC}}\). Every below-knee seed stalls
+at 6--50\% of its target, and the estimator anchored on cells
+contaminated by off-manifold excursions. Decomposed, the law itself was
+untouched --- across the 23 excursion-free cells, measured cost matched
+the analytic cost \emph{of the gain each run actually reached} with
+median ratio 0.994, 22 of 23 within 10\%.
+
+E10 tested this prospectively rather than arguing it. Placing a
+one-parameter policy \textbf{at} \(k_{\text{AC}}(\lambda)\) by
+construction removes the reachability failure by design, and the
+registered prediction is the same quantity E7 got wrong. P11.3: measured
+\(\lambda_{1/2}\) falls within 0.01 of its grid-matched analytic target
+on \textbf{all four} instances, with absolute differences of 0.00021,
+0.00014, 0.00101 and 0.00497 --- a frozen point prediction hit at four
+locations, at one to two orders of magnitude inside its own tolerance.
+This is the paper's central empirical result.
+
+\subsection{The scope law, confirmed in both
+directions}
+
+The scope claim is that the confound requires actions to influence the
+hidden state: when transitions are action-independent, the critic's bias
+cancels identically from every action preference at every \(\lambda\)
+(\S3.2). Because it predicts \emph{absence}, it is testable in a way most
+mechanism claims are not.
+
+\textbf{In-domain.} On the decoupled arm the largest learned gain across
+the whole \(\lambda\) grid is 0.0079 with spread 0.0091 (P6.3), against
+a coupled-arm difference of 5.853 at \(\lambda = 0.9\) --- an arm ratio
+of 3.52 (P6.4). Same representation, same optimiser, same evaluator;
+only the coupling differs.
+
+\textbf{External, scope condition met.} On position-only CartPole, where
+the agent applies force and the hidden velocity responds, all three
+registered predictions passed: the memoryless architecture steps down
+below the horizon (Easy \(-0.0213\), 95\% CI \([-0.0288, -0.0140]\);
+Hard \(-0.0060\), CI \([-0.0095, -0.0018]\)), no step is resolvable
+above it (six comparisons, every CI containing zero), and the memory
+architecture's across-seed variance concentrates at low \(\lambda\) by a
+pooled factor of 42.6 (P9.1--P9.3).
+
+\textbf{External, scope condition not met.} Two POPGym game environments
+were tested and neither shows the effect. On BattleshipEasy the capability
+gates failed (both arms at the floor), so P12.1--P12.3 are \emph{not scored}.
+On MineSweeperMedium the gates passed --- our memoryless arm reproduces POPGym's
+published MLP score to $0.012$, and the memory advantage at $\lambda=1.0$ is
+$+0.121$ --- and all three registered predictions then failed: the advantage
+at $\lambda=0.95$ is $+0.091$, \emph{smaller} than at $1.0$, the opposite of
+the registered direction (P15.1), and no structure appears at the computed
+knee (P15.3). We registered these as positive predictions and report them as
+failures. The reading the scope law supplies: in both games the latent is
+fixed at reset and actions \emph{reveal} it rather than steer it, so there is
+no equilibrium to displace; that distinction was not in our claim set when
+E12 was designed, and the $\tau$ used to place its knee was an episode length
+rather than a relaxation time. Both errors are ours. Independently, the
+released diagnostic (\S\ref{sec:diagnostic}) finds no trace of the mechanism's
+signature in E12's training curves --- memoryless-arm excursions are at noise
+level and flat across $\lambda$ rather than concentrated below the knee. The
+instrument reports the effect absent, not swamped (Appendix~\ref{app:e12}).
+
+\textbf{Second in-scope external (E14, pending).}
+% ---------------------------------------------------------------------
+% SLOT: position-only Pendulum. Prereg to be frozen before any run; the
+% three registered predictions mirror P9.1-P9.3 on new dynamics (torque
+% steers a hidden angular velocity). Reported whichever way it returns.
+% Fill from prereg_e14.py's VERDICTS line; do not paraphrase.
+% ---------------------------------------------------------------------
+\textbf{[E14 --- RESULT PENDING. Position-only Pendulum, preregistered
+replication of the in-scope external test on independent dynamics.]}
+
+\subsection{Generality beyond the minimal instance}
+
+\textbf{Kernel and dimension.} Recomputing the exact objects of
+\S\ref{sec:theory} for Prony kernels at state dimensions 2--4, including
+non-Markovian observed dynamics, reproduces the same structure at every
+kernel: an inflated equilibrium below a knee, a 14--16$\times$ collapse
+across the grid, and both thresholds. Two properties are \emph{not}
+kernel-universal and are reported: $\lambda_{1/2}$ is not ordered by kernel
+correlation time across kernel \emph{shapes} (it is within the single-mode
+family, P10.2), and $\lambda^\ast<\lambda_{1/2}$ inverts for a slow minority
+mode.
+
+\textbf{Nonlinearity.} E13 added a cubic damping the theory cannot absorb,
+sized at 10\% and 50\% of the dominant balance at the above-knee equilibrium,
+and asked whether the \emph{linearized} theory still locates the threshold.
+It does: measured $\lambda_{1/2}$ is $0.985529$ and $0.985542$ against
+$0.983837$ --- within $0.0017$ at a registered tolerance of $0.005$ --- while
+the perturbation moves the floor cost by $2.5\times$ and sharpens the collapse
+(profile ratio $1.34\to1.82\to3.38$). The zero-perturbation control
+reproduces the linearized value to $1.8\times10^{-5}$ (G13, P16.1, P16.2).
+
+\textbf{Drive distribution.} At matched autocovariance the equilibrium
+\emph{location} moves $3.4\times$ across Gaussian, bounded and kurtotic
+drives while the cost at equilibrium stays within 1--7\% of $r\Theta K(0)$
+(companion derivation). This split predicts the ledger: every failed
+location prediction (P6.1, P11.1, P10.1) is in the fragile class; every
+passed cost or threshold prediction (P6.2, P11.3, P16.1--.2, and the cost
+map holding to $\le1.05\%$ at every measured gain in all 32 E10 cells) is in
+the robust class.
+
+\subsection{The mechanism: what is confirmed, and what is
+not}
+
+The off-manifold stability index \(S(\lambda, k)\) carries the bootstrap
+weight \((1-\lambda)/\lambda\) as its destabilising factor and predicts
+a second threshold. It is validated against Monte Carlo to 1--3\% at ten
+points. Its experimental record is mixed, and the preregistration fixed
+in advance how to read that.
+
+What passed: the predicted onset falls with \(\gamma h\) in the measured
+ordering (P10.2); and in the perturbation-decay test, all 8 cells
+predicted unstable read unstable (P11.4's unstable side, 8/8).
+
+What failed: the onset bracket contains \(\lambda^\ast\) on 2 of 3
+prospective instances, and the miss sits \emph{below} the predicted
+bracket, which the frozen file classifies as a hard failure rather than
+an incomplete mechanism (P10.1). The predicted widening of the gap
+between the two thresholds does not appear --- measured gaps are 0.0066,
+0.0054 and 0.0080 where the theory predicts 0.0010, 0.0095 and 0.0570
+(P10.3). And 18 of 21 cells predicted stable read stable, against a
+registered allowance of 19 (P11.4).
+
+\texttt{e7-diagnosis-cost-law.md} \S5, written before E10 ran, states
+that P11.4 failing beyond its allowance demotes the bias-direction
+mechanism ``to a suggestive calculation''. We apply that rule. The
+mechanism is reported as suggestive, not confirmed.
+
+The three P11.4 misses are the three scored cells with the smallest positive
+$S$, each adjacent to its instance's knee, and resolvability at this budget is
+asymmetric (growth resolves to $|S|=1.3\times10^{-4}$, decay only to
+$S\ge1.1\times10^{-2}$); the registered floor was calibrated on a growth cell
+and applied symmetrically, a design error we would not repeat. Neither
+observation is offered as a rescue (Appendix~\ref{app:mechanism}). P11.1 and
+P11.2 also failed --- 19 of 32 cells drifted outside the 15\% gain tolerance
+--- and their verified decomposition is that all 96 runs drifted
+\emph{downward}, the analytic cost map holds to $\le1.05\%$ at every measured
+gain including every failing cell, and failure aligns with the branch of the
+equilibrium map rather than with $\lambda$ (Appendix~\ref{app:drift}). P11.3
+is estimated from the shape of that intact cost profile, which is why it
+survives what P11.1 and P11.2 did not.
+
+\subsection{The diagnostic}
+\label{sec:diagnostic}
+
+The intermittency statistic is released as a tool practitioners can run
+on any continuous-control log without adopting our theory. Its three
+registered tripwires fired zero false positives (0 of 40 decoupled-arm
+runs, 0 of 40 on the no-onset instance, 0 of 180 above-horizon
+memoryless runs), and its one prospective specificity prediction passed
+on 50 runs with zero flags (P13.1). Sensitivity against a privileged
+detector is 17 of 23; the tool is deliberately blind to chronic
+elevation, which is documented as a scope property rather than tuned
+away.
+
+\subsection{Ledger}
+\label{sec:ledger}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc@{\hspace{10pt}}llc@{}}
+\toprule
+id & claim & verdict & id & claim & verdict \\
+\midrule
+G2 & POPGym gaps shrink at $\lambda{=}0.9$ & \textbf{F} &
+P10.3 & two-threshold gap widens & \textbf{F} \\
+G3 & $\lambda$-sweep classifies memory-need & \textbf{F} &
+P11.1--.2 & equilibrium holds; cost law at $k_{\mathrm{AC}}$ & \textbf{F}$\times$2 \\
+P6.1 & below-horizon gain lands at $k_{\mathrm{AC}}$ & \textbf{F} &
+P11.3 & $\lambda_{1/2}$ within 0.01, four instances & P \\
+P6.2 & cost ratio $\ge1.25\times$ & P (2.63) &
+P11.4 & kicked-bias decay pattern & \textbf{F} (26/29) \\
+P6.3 & decoupled arm flat in $\lambda$ & P &
+P13.1 & diagnostic specificity, prospective & P \\
+P6.4 & arm ratio $\ge3$ & P (3.52) &
+P15.1--.3 & $\lambda$-dependence, MineSweeperMedium & \textbf{F}$\times$3 \\
+P7.1--.3 & $\lambda_{1/2}$ from trained agents & \textbf{F}$\times$3 &
+P16.1--.2 & $\lambda_{1/2}$ under cubic damping & P$\times$2 \\
+P9.1--.3 & CartPole step-down, absence, variance & P$\times$3 &
+P17.1--.3 & Pendulum (E14) & \textit{pending} \\
+P10.1 & onset bracket contains $\lambda^\ast$ & \textbf{F} (2/3) &
+& & \\
+P10.2 & onset ordering in $\gamma h$ & P & & & \\
+\bottomrule
+\end{tabular}
+\caption{Every registered prediction and its verdict as scored by the frozen
+file (P = pass, \textbf{F} = fail): 11 passed, 14 failed, 25 scored, E14
+pending. Capability gates, reported separately: G1a--c pass (pilot),
+G11a--b \textbf{fail} (E11; P12.1--P12.3 therefore not scored), G12a--c pass
+(E12), G13 pass (E13). Generated by \texttt{analysis/recount\_ledger.py}.}
+\label{tab:ledger}
+\end{table}
