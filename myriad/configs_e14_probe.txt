@@ -1,0 +1,4 @@
+--env PositionOnlyPendulumEasy --arch mlp --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl
+--env PositionOnlyPendulumEasy --arch gru128 --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl
+--env PositionOnlyPendulumHard --arch mlp --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl
+--env PositionOnlyPendulumHard --arch gru128 --gae-lambda 1.0 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl

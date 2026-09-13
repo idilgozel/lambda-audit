@@ -32,6 +32,8 @@ __all__ = [
     "RepeatPrevious", "RepeatPreviousEasy", "RepeatPreviousMedium",
     "RepeatPreviousHard", "PositionOnlyCartPole", "PositionOnlyCartPoleEasy",
     "PositionOnlyCartPoleMedium", "PositionOnlyCartPoleHard",
+    "PositionOnlyPendulum", "PositionOnlyPendulumEasy",
+    "PositionOnlyPendulumMedium", "PositionOnlyPendulumHard",
     "Battleship", "BattleshipEasy",
     "MineSweeper", "MineSweeperEasy", "MineSweeperMedium",
     "Discrete", "Box", "make",
@@ -248,6 +250,104 @@ class PositionOnlyCartPoleHard(PositionOnlyCartPole):
         super().__init__(max_episode_length=600)
 
 
+# --- PositionOnlyPendulum (E14, 2026-09-11) ---------------------------------
+
+class PositionOnlyPendulum:
+    """Pendulum swing-up with the angular velocity removed from the observation.
+
+    Mirrors popgym.envs.position_only_pendulum.PositionOnlyPendulum, which
+    subclasses gymnasium's PendulumEnv (g = 10, m = l = 1, dt = 0.05,
+    max_speed 8, max_torque 2). The semi-implicit Euler step, the torque and
+    speed clips, the cost, the reward transform and the reset distribution
+    (theta ~ U(-pi, pi), theta_dot ~ U(-1, 1)) are copied exactly, in the
+    same floating-point operation order, so test_env_equivalence.py can
+    assert bitwise identity. The observation is [cos theta, sin theta]; the
+    hidden coordinate is theta_dot, which the torque steers directly
+    (delta theta_dot = 0.15 u per step), i.e. the scope proposition's
+    positive side.
+
+    This is the audit's first CONTINUOUS-action external environment. The
+    action space is a Box on [-2, 2]; the harness's Gaussian head with a
+    pinned sigma handles it, and the harness clips before stepping exactly as
+    it does for the GLEAM instances. The environment ALSO clips (gymnasium
+    does), which is reproduced here so the two implementations agree on
+    out-of-range actions too.
+    """
+
+    max_speed = 8
+    max_torque = 2.0
+    dt = 0.05
+    g = 10.0
+    m = 1.0
+    l = 1.0
+    reward_low = -16.2736044
+    reward_high = 0.0
+
+    def __init__(self, max_episode_length=200):
+        self.max_episode_length = int(max_episode_length)
+        self.action_space = Box(-self.max_torque, self.max_torque, (1,), np.float32)
+        high = np.array([1.0, 1.0], dtype=np.float32)
+        self.observation_space = Box(-high, high, (2,), np.float32)
+        self.rng = _make_rng(None)
+        self.state = None
+        self.num_steps = 0
+
+    @staticmethod
+    def _angle_normalize(x):
+        return ((x + np.pi) % (2 * np.pi)) - np.pi
+
+    def _get_obs(self):
+        theta, thetadot = self.state
+        # gymnasium builds the 3-vector in float32 and popgym slices off the
+        # last entry; build the same 3-vector so the rounding is identical.
+        full = np.array([np.cos(theta), np.sin(theta), thetadot], dtype=np.float32)
+        return full[:-1]
+
+    def _reward_transform(self, reward):
+        low, high = self.reward_low, self.reward_high
+        shifted = reward + (high - low) / 2
+        scaled = shifted / ((high - low) / 2)
+        return scaled / self.max_episode_length
+
+    def reset(self, seed=None, options=None):
+        if seed is not None:
+            self.rng = _make_rng(seed)
+        self.num_steps = 0
+        high = np.array([np.pi, 1.0])
+        low = -high
+        self.state = self.rng.uniform(low=low, high=high)
+        return self._get_obs(), {}
+
+    def step(self, action):
+        th, thdot = self.state
+        g, m, l, dt = self.g, self.m, self.l, self.dt
+        u = np.clip(action, -self.max_torque, self.max_torque)[0]
+        costs = self._angle_normalize(th) ** 2 + 0.1 * thdot ** 2 + 0.001 * (u ** 2)
+        newthdot = thdot + (3 * g / (2 * l) * np.sin(th) + 3.0 / (m * l ** 2) * u) * dt
+        newthdot = np.clip(newthdot, -self.max_speed, self.max_speed)
+        newth = th + newthdot * dt
+        self.state = np.array([newth, newthdot])
+        self.num_steps += 1
+        truncated = self.num_steps >= self.max_episode_length
+        reward = self._reward_transform(-costs)
+        return self._get_obs(), reward, False, truncated, {}
+
+
+class PositionOnlyPendulumEasy(PositionOnlyPendulum):
+    def __init__(self):
+        super().__init__(max_episode_length=200)
+
+
+class PositionOnlyPendulumMedium(PositionOnlyPendulum):
+    def __init__(self):
+        super().__init__(max_episode_length=150)
+
+
+class PositionOnlyPendulumHard(PositionOnlyPendulum):
+    def __init__(self):
+        super().__init__(max_episode_length=100)
+
+
 # --- Battleship ------------------------------------------------------------
 
 class Battleship:
@@ -458,6 +558,9 @@ REGISTRY = {
     "PositionOnlyCartPoleEasy": PositionOnlyCartPoleEasy,
     "PositionOnlyCartPoleMedium": PositionOnlyCartPoleMedium,
     "PositionOnlyCartPoleHard": PositionOnlyCartPoleHard,
+    "PositionOnlyPendulumEasy": PositionOnlyPendulumEasy,
+    "PositionOnlyPendulumMedium": PositionOnlyPendulumMedium,
+    "PositionOnlyPendulumHard": PositionOnlyPendulumHard,
     "BattleshipEasy": BattleshipEasy,
     "MineSweeperEasy": MineSweeperEasy,
     "MineSweeperMedium": MineSweeperMedium,

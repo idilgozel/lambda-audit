@@ -25,7 +25,7 @@ echo "=== queue state"
 # this filter makes a RUNNING job report as "no jobs queued", which is worse
 # than no queue section at all: it reads as "the run is done, go collect".
 # lam_e12 also matches lam_e12p by prefix; both are listed for legibility.
-"${SSH[@]}" "qstat 2>/dev/null | grep -E 'lam_cap|lam_pilot|lam_e6|lam_e7|lam_e9|lam_e10|lam_e11|lam_e12p|lam_e12|job-ID|---' || echo '  no lambda-audit jobs queued or running'"
+"${SSH[@]}" "qstat 2>/dev/null | grep -E 'lam_cap|lam_pilot|lam_e6|lam_e7|lam_e9|lam_e10|lam_e11|lam_e12p|lam_e12|lam_e14|job-ID|---' || echo '  no lambda-audit jobs queued or running'"
 
 echo
 echo "=== pulling results, curves and logs"
@@ -49,10 +49,11 @@ PHASE2_JSONL="$DEST/results/results_phase2.jsonl"
 E10_JSONL="$DEST/results/results_e10.jsonl"
 E11_JSONL="$DEST/results/results_e11.jsonl"
 E12_JSONL="$DEST/results/results_e12.jsonl"
+E14_JSONL="$DEST/results/results_e14.jsonl"
 
 echo
 echo "=== what arrived"
-for f in "$PILOT_JSONL" "$PHASE2_JSONL" "$E10_JSONL" "$E11_JSONL" "$E12_JSONL"; do
+for f in "$PILOT_JSONL" "$PHASE2_JSONL" "$E10_JSONL" "$E11_JSONL" "$E12_JSONL" "$E14_JSONL"; do
   if [ -f "$f" ]; then
     printf '  %-28s %s rows\n' "$(basename "$f")" "$(wc -l < "$f" | tr -d ' ')"
   else
@@ -259,4 +260,54 @@ if [ -f "$E12_JSONL" ]; then
   python3 "$ROOT/prereg_e12.py" "$E12_JSONL" 2>&1 || true
 else
   echo "  no results_e12.jsonl yet"
+fi
+
+echo
+echo "=== E14 coverage (PositionOnlyPendulum Easy / Hard)"
+# E14 is submitted in stages against ONE results file: a 4-run probe (mlp +
+# gru128 at lambda 1.0, seed 1, both variants) whose per-variant gates are
+# read BEFORE each variant's grid (two arrays each, skipping the probe cells).
+if [ -f "$E14_JSONL" ]; then
+  python3 - "$E14_JSONL" <<'PY4'
+import json, sys, collections
+rows = [json.loads(l) for l in open(sys.argv[1]) if l.strip()]
+if not rows:
+    print("  results_e14.jsonl is present but empty"); sys.exit(0)
+envs = ("PositionOnlyPendulumEasy", "PositionOnlyPendulumHard")
+print(f"  {len(rows)} rows (probe 4, each variant's grid +78, full 160)")
+for env in envs:
+    by = collections.Counter((r.get("arch", ""), r.get("lam")) for r in rows if r.get("env") == env)
+    n = sum(by.values())
+    print(f"  {env}: {n} / 80 rows")
+    for k in sorted(by, key=lambda t: (t[0], t[1] if t[1] is not None else -1)):
+        print(f"      {k[0]:10} lam {str(k[1]):<6} {by[k]:4d}")
+    probe = {r.get("arch") for r in rows
+             if r.get("env") == env and r.get("lam") == 1.0 and r.get("seed") == 1}
+    missing = {"mlp", "gru128"} - probe
+    if missing:
+        print(f"      probe INCOMPLETE for this variant: waiting on {sorted(missing)}; do NOT submit its grid")
+    else:
+        print(f"      probe complete for this variant; gates readable below")
+d = collections.Counter()
+for r in rows:
+    try:
+        d[(str(r.get("env")), str(r.get("arch")), round(float(r.get("lam")), 6), int(r.get("seed")))] += 1
+    except (TypeError, ValueError):
+        pass
+bad = {k: c for k, c in d.items() if c > 1}
+if bad:
+    print(f"  WARNING: {len(bad)} duplicated (env, arch, lambda, seed) cells; prereg_e14.py will refuse")
+sig = {r.get("fix_sigma") for r in rows}
+print(f"  fix_sigma values present: {sorted(sig, key=str)}")
+PY4
+else
+  echo "  no results_e14.jsonl yet"
+fi
+
+echo
+echo "=== preregistered gates: E14 (read these BEFORE submitting a variant's grid)"
+if [ -f "$E14_JSONL" ]; then
+  python3 "$ROOT/prereg_e14.py" "$E14_JSONL" 2>&1 || true
+else
+  echo "  no results_e14.jsonl yet"
 fi

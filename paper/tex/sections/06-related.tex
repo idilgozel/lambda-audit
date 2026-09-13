@@ -1,5 +1,51 @@
+% ---------------------------------------------------------------------------
+% Section 6: Related work. Draft v1, 2026-09-11 (Day 6, pulled forward).
+% Target ~300 words. Bib entries added to refs.bib the same day; verify the
+% Andrychowicz lambda sentence against the paper's advantage-estimation
+% section on Day 11.
+% ---------------------------------------------------------------------------
+
 \section{Related work}
+\label{sec:related}
 
-\textbf{[RELATED WORK --- Day 6, target 300 words.]}
+\paragraph{Memoryless policies and eligibility traces.} That the best
+memoryless policy in a POMDP is stochastic and that TD-style learning of it
+can fail without state estimation was established by
+\citet{singh1994learning} and \citet{jaakkola1995reinforcement}, building on
+the perceptual-aliasing problem of \citet{whitehead1991learning}. The closest
+antecedent to our result is \citet{loch1998using}, who showed empirically that
+Sarsa($\lambda$) with large $\lambda$ finds better memoryless policies than
+$\lambda=0$ on aliased gridworlds. We give the mechanism an exact form: a
+closed-form map from $\lambda$ to the equilibrium the averaged actor--critic
+update converges to, a cost law with a predicted threshold, and a proposition
+stating when the effect is absent.
 
-This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. 
+\paragraph{Critic bias under partial observability.} The bias--variance
+trade-off of TD($\lambda$) is classical \citep{kearns2000bias}; that an
+observation-restricted critic biases the policy gradient in POMDPs, and that a
+state-conditioned critic can remove the bias, is developed by
+\citet{baisero2022unbiased}. Our contribution is orthogonal: we hold the critic
+observation-restricted, as memory benchmarks do, and compute how far and in
+which direction the bootstrap horizon moves the learned policy.
+
+\paragraph{Hyperparameter studies.} Large-scale studies of on-policy
+actor--critic methods find the advantage estimator's $\lambda$ among the
+sensitive choices \citep{andrychowicz2021what}, and the reproducibility
+literature documents how implementation and configuration decide outcomes
+\citep{henderson2018deep,engstrom2020implementation}. Those studies are on
+fully observed control; none isolates the interaction between $\lambda$ and
+hidden-state timescale that a memory comparison manipulates.
+
+\paragraph{Memory benchmarks.} POPGym \citep{morad2023popgym} and Memory Gym
+\citep{pleines2023memory} rank architectures at a fixed $\lambda$; recurrent
+baselines are tuned the same way \citep{hausknecht2015deep,ni2022recurrent}.
+The scope proposition says which of these environments the confound can reach
+at all, and \S\ref{sec:results} shows both outcomes under one harness.
+
+\paragraph{Preregistration and statistical practice.} We follow the
+interquartile-mean and bootstrap-interval conventions of
+\citet{agarwal2021deep}, and take preregistration as method from
+\citet{nosek2018preregistration}. What we add is the executable form:
+constants and scorers frozen in code, checked mechanically at deployment, with
+capability gates scored before predictions and every registered outcome
+reported.

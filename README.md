@@ -25,10 +25,13 @@ to submit if a check fails. Amendments are dated; post-data amendments are
 disclosed as such in the file that carries them. Scoring refuses to run on data
 with duplicated cells.
 
-Scored to date: 13 predictions passed, 9 failed, 1 partial. The failures are
-part of the record and are analysed rather than removed — one of them (E7)
-produced the project's most informative result, and the E10 failures are
-diagnosed in `e10-above-knee-drift.md`.
+Scored to date: 11 predictions passed, 14 failed, of 25 registered; capability
+gates 7 passed, 2 failed, reported separately (`python3
+analysis/recount_ledger.py` regenerates these counts from the scorers). The
+failures are part of the record and are analysed rather than removed — one of
+them (E7) produced the project's most informative result, and the E10 failures
+are diagnosed in `e10-above-knee-drift.md`. E14 (three predictions, six
+per-variant gates) is frozen and pending.
 
 ## Preregistrations
 
@@ -41,6 +44,8 @@ diagnosed in `e10-above-knee-drift.md`.
 | `prereg_e8.py` | Intermittency diagnostic tripwires | 2026-08-18 |
 | `prereg_e11.py` | External validity, BattleshipEasy (gates failed; see `e11-findings.md`) | 2026-08-18 |
 | `prereg_e12.py` | External validity, MineSweeperMedium, gated probe first | 2026-08-21 |
+| `prereg_e13.py` | Cubic-damping perturbation of the cost-law threshold | 2026-08-21 |
+| `prereg_e14.py` | Second in-scope external test, PositionOnlyPendulum, per-variant gated probe first | 2026-09-11 |
 
 Run any of them with no arguments to print the frozen predictions; pass a
 results file to score. `prereg_e10.py --check-clean <file>` verifies no data

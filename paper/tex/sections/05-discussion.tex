@@ -1,5 +1,73 @@
+% ---------------------------------------------------------------------------
+% Section 5: Discussion and limitations. Draft v1, 2026-09-11 (Day 5).
+% Target ~500 words. Content from paper/00-drafting-plan.md section 4 and
+% the disclosures paragraph of paper/03-method.md section 3.6 (moved here
+% from the testbed section on Day 4). Every number is quoted from a frozen
+% scorer or from PROVENANCE.md.
+% ---------------------------------------------------------------------------
+
 \section{Discussion and limitations}
+\label{sec:discussion}
 
-\textbf{[DISCUSSION AND LIMITATIONS --- Day 5, target 500 words.]}
+\paragraph{What the audit licenses.} Every prospective, passing result is
+exact in-domain: the equilibrium map, the cost law and its threshold are
+theorems about a linear-quadratic-Gaussian family, and the experiments confirm
+that PPO with an observation-restricted critic lands where those theorems say.
+Outside the family the paper has a proposition about \emph{absence} and one
+positive external result. The bridge from the testbed to a benchmark is the
+identification of the hidden coordinate's relaxation time with the horizon
+that must exceed it; that is an analogy with a derivation behind it, not a
+derivation, and E12 is what it looks like when the analogy is applied with the
+wrong timescale. The pending E14 registers the timescale from the system's
+dynamics and brackets the knee rather than pinning it (\S\ref{sec:results}).
 
-This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. This placeholder occupies the space budgeted for this section so that the compiled page count includes every component of the finished paper. It carries no content and will be replaced in full. 
+\paragraph{The live alternative.} A memoryless agent that does worse at low
+$\lambda$ might simply be undertrained there. Two registered results
+separate the accounts. The decoupled arm shares representation, optimiser,
+budget and evaluator with the coupled arm and shows no $\lambda$ dependence
+at all (P6.3, largest gain $0.0079$); undertraining would not respect the
+scope proposition's boundary. And the open-loop control in the pilot (G2)
+shows nothing where the proposition predicts nothing. What remains open is
+whether the low-$\lambda$ \emph{memory}-arm variance (P9.3, a factor of 42.6)
+is the mechanism's non-convergence or ordinary optimisation noise; the
+demoted stability calculation predicts the former and the evidence is mixed.
+
+\paragraph{Measurement.} Five seeds per cell and a 15M-step budget are the
+resolution of every verdict here, and the equivalence tests state their
+margins for that reason. Cluster nodes of different CPU generations produce
+bit-different trajectories from identical seeds; the class of every job is
+recorded, and the largest cross-class perturbation among seven reruns is
+$1.9$ across-seed standard deviations, moving no verdict. One comparison
+inherits a caveat: P7.2 orders instances whose cells were not all produced on
+bitwise-comparable hardware. It failed as registered, so no claim rests on it.
+
+\paragraph{Departures from the discipline.} A pre-submission audit found
+two, and an audit paper does not get to hide its own findings. The scoring
+code for P10.1--P10.3 was implemented after the data existed (constants and
+predictions frozen 2026-08-14; the file's advertised scoring mode was a stub
+until 2026-08-21, and the implemented scorer prints a sensitivity table over
+the one aggregation choice the freeze had left open). The diagnostic
+preregistration (E8) lacked a mechanical freeze assertion until the same date.
+Two further post-data amendments are verdict-neutral by construction and
+disclosed in the files that carry them: E12's scorer gained a duplicate-cell
+refusal after its grid re-ran the probe's reference cells, and a crash guard
+on its own success path. Git dates before 21 August are uninformative because
+the initial commit was amended; the freeze order is corroborated by cluster
+job logs instead (Appendix~\ref{app:provenance}).
+
+\paragraph{What we would do differently.} Capability probes before grids:
+E11 spent 119 core-hours on a grid whose gates then failed, and every later
+experiment runs two to four probe tasks first. Equivalence tests rather than
+``CI contains zero'' for claims of no effect, which get harder to satisfy as
+data improve; E14's equivalence criterion was itself revised before its freeze
+when a power simulation showed the per-cell form failing its own registered
+pattern on noise. Tolerances in absolute rather than relative units where the
+target is small (E10's lesson). And a relaxation time, never an episode
+length, to place a knee.
+
+\paragraph{The artifact.} The preregistrations, scorers, the ledger
+generator, the bitwise-verified environment ports, the harness and every
+results row are released, with a chronology that says what the history can
+and cannot show. A reader who disagrees with a threshold can rescore; a reader
+who disagrees with the theory can regenerate every reference number. That,
+rather than the count of passes, is what we think an audit is for.

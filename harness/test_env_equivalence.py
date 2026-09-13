@@ -28,6 +28,11 @@ try:
         PositionOnlyCartPoleMedium as PgCPMedium,
         PositionOnlyCartPoleHard as PgCPHard,
     )
+    from popgym.envs.position_only_pendulum import (
+        PositionOnlyPendulumEasy as PgPdEasy,
+        PositionOnlyPendulumMedium as PgPdMedium,
+        PositionOnlyPendulumHard as PgPdHard,
+    )
 except ImportError:
     print("popgym not installed. This test must run where popgym is available.")
     sys.exit(2)
@@ -86,6 +91,58 @@ def run_pair(make_pg, make_native, label, n_seeds=8, n_episodes=4):
     return total
 
 
+def run_pair_continuous(make_pg, make_native, label, n_seeds=8, n_episodes=4):
+    """E14 (2026-09-11): the continuous-action counterpart of run_pair.
+
+    Actions are float64 arrays of shape (1,) drawn uniformly on [-2.5, 2.5],
+    deliberately WIDER than the [-2, 2] torque bound so that the clip inside
+    the environment is exercised on both implementations. Observations,
+    rewards and both flags are compared bitwise exactly as in run_pair, and
+    the hidden state (theta, theta_dot) is compared bitwise after every step
+    as well, since the observation alone cannot see theta_dot.
+    """
+    total = 0
+    for seed in range(n_seeds):
+        pg = make_pg()
+        nv = make_native()
+        rng = np.random.default_rng(1234 + seed)
+        for ep in range(n_episodes):
+            n_actions = 2000
+            acts = [np.array([rng.uniform(-2.5, 2.5)], dtype=np.float64)
+                    for _ in range(n_actions)]
+            oa, _ = pg.reset(seed=seed) if ep == 0 else pg.reset()
+            ob, _ = nv.reset(seed=seed) if ep == 0 else nv.reset()
+            assert bits(oa) == bits(ob), (
+                f"{label} seed={seed} ep={ep}: reset obs differ. "
+                f"popgym={oa!r} native={ob!r}")
+            assert bits(pg.state) == bits(nv.state), (
+                f"{label} seed={seed} ep={ep}: reset hidden state differs")
+            n = 0
+            for a in acts:
+                oa, rwa, ta, tra, _ = pg.step(a)
+                ob, rwb, tb, trb, _ = nv.step(a)
+                assert bits(oa) == bits(ob), (
+                    f"{label} seed={seed} ep={ep} step {n}: obs differ. "
+                    f"popgym={oa!r} native={ob!r}")
+                assert bits(np.float64(rwa)) == bits(np.float64(rwb)), (
+                    f"{label} seed={seed} ep={ep} step {n}: reward differ. "
+                    f"popgym={rwa!r} native={rwb!r}")
+                assert bits(pg.state) == bits(nv.state), (
+                    f"{label} seed={seed} ep={ep} step {n}: hidden state "
+                    f"differs. popgym={pg.state!r} native={nv.state!r}")
+                assert bool(ta) == bool(tb), (
+                    f"{label} step {n}: terminated differ {ta} vs {tb}")
+                assert bool(tra) == bool(trb), (
+                    f"{label} step {n}: truncated differ {tra} vs {trb}")
+                n += 1
+                if ta or tb or tra or trb:
+                    break
+            total += n
+    print(f"  OK  {label}: {total} steps compared bitwise (obs, reward, flags "
+          f"AND hidden state) across {n_seeds} seeds x {n_episodes} episodes")
+    return total
+
+
 def main():
     print("Bitwise equivalence: popgym vs envs_native")
     grand = 0
@@ -101,6 +158,13 @@ def main():
                       "PositionOnlyCartPoleMedium")
     grand += run_pair(PgCPHard, native.PositionOnlyCartPoleHard,
                       "PositionOnlyCartPoleHard")
+    # E14 (2026-09-11): the continuous-action environment.
+    grand += run_pair_continuous(PgPdEasy, native.PositionOnlyPendulumEasy,
+                                 "PositionOnlyPendulumEasy")
+    grand += run_pair_continuous(PgPdMedium, native.PositionOnlyPendulumMedium,
+                                 "PositionOnlyPendulumMedium")
+    grand += run_pair_continuous(PgPdHard, native.PositionOnlyPendulumHard,
+                                 "PositionOnlyPendulumHard")
 
     # spaces must agree too
     for pg_cls, nv_cls, label in [
@@ -115,6 +179,17 @@ def main():
             assert int(pobs.n) == int(nobs.n), label
         else:
             assert tuple(pobs.shape) == tuple(nobs.shape), label
+        assert p.max_episode_length == n.max_episode_length, label
+    for pg_cls, nv_cls, label in [
+        (PgPdEasy, native.PositionOnlyPendulumEasy, "PositionOnlyPendulumEasy"),
+        (PgPdMedium, native.PositionOnlyPendulumMedium, "PositionOnlyPendulumMedium"),
+        (PgPdHard, native.PositionOnlyPendulumHard, "PositionOnlyPendulumHard"),
+    ]:
+        p, n = pg_cls(), nv_cls()
+        assert tuple(p.action_space.shape) == tuple(n.action_space.shape), label
+        assert float(p.action_space.low[0]) == float(n.action_space.low), label
+        assert float(p.action_space.high[0]) == float(n.action_space.high), label
+        assert tuple(p.observation_space.shape) == tuple(n.observation_space.shape), label
         assert p.max_episode_length == n.max_episode_length, label
     print(f"  OK  spaces and episode lengths agree")
 

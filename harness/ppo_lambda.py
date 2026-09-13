@@ -498,6 +498,18 @@ def evaluate(agent, env_id, stack, episodes, seed, gamma, device,
 
     env = make_env(env_id)
     enc, base = obs_encoder(env.observation_space)
+    # E14 (2026-09-11): episodic environments with a CONTINUOUS action
+    # (PositionOnlyPendulum). Deployed evaluation uses the policy MEAN with
+    # the declared clip, the same convention as evaluate_continuous, so the
+    # reported return is the learned policy's and not the pinned exploration
+    # noise's. The test is on the action space and consumes no RNG; a
+    # discrete environment takes exactly the path it took before this line,
+    # call for call, so every published discrete number is untouched
+    # (harness/test_arch_regression.py).
+    episodic_continuous = is_continuous(env.action_space)
+    if episodic_continuous:
+        a_low = float(env.action_space.low)
+        a_high = float(env.action_space.high)
     buf = deque(maxlen=stack)
     rets, vs, gs, gls = [], [], [], []
     for ep in range(episodes):
@@ -513,8 +525,13 @@ def evaluate(agent, env_id, stack, episodes, seed, gamma, device,
         while True:
             x = torch.tensor(np.concatenate(list(buf)), dtype=torch.float32,
                              device=device).unsqueeze(0)
-            a, _, _, v, h = agent.act(x, h, done_flag)
-            o, r, te, tr, _ = env.step(int(a.item()))
+            if episodic_continuous:
+                a, _, _, v, h = agent.act(x, h, done_flag, deterministic=True)
+                u = np.clip(a.detach().numpy().reshape(-1), a_low, a_high)
+                o, r, te, tr, _ = env.step(u)
+            else:
+                a, _, _, v, h = agent.act(x, h, done_flag)
+                o, r, te, tr, _ = env.step(int(a.item()))
             total += r
             if collect_gap:
                 ep_v.append(float(v.item()))

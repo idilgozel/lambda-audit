@@ -47,6 +47,9 @@ FILES=(
   "myriad/configs_e11.txt"
   "myriad/configs_e12_probe.txt"
   "myriad/configs_e12.txt"
+  "myriad/configs_e14_probe.txt"
+  "myriad/configs_e14_easy.txt"
+  "myriad/configs_e14_hard.txt"
   "myriad/pilot_array.qsub.sh"
   "myriad/bootstrap_myriad.sh"
 )
@@ -69,7 +72,7 @@ fi
 # deployment or collection script -- the only two preregs outside the
 # pre-flight, found by a pre-submission audit. Every prereg now ships through
 # the same gate.
-for prereg in prereg_e7_bias.py prereg_e8.py; do
+for prereg in prereg_e7_bias.py prereg_e8.py prereg_e14.py; do
   if [ -f "$ROOT/$prereg" ]; then
     if python3 "$ROOT/$prereg" >/dev/null 2>&1; then
       echo "     ok  $prereg is frozen"
@@ -81,6 +84,20 @@ for prereg in prereg_e7_bias.py prereg_e8.py; do
     fi
   fi
 done
+# 2026-09-11: the E14 config files are GENERATED from prereg_e14.py
+# (sigma, eval episodes, grid, budget). A hand edit to either side is caught
+# here rather than discovered in a results row.
+if [ -f "$ROOT/prereg_e14.py" ]; then
+  if python3 "$ROOT/analysis/gen_e14_configs.py" --check >/dev/null 2>&1; then
+    echo "     ok  configs_e14_*.txt match prereg_e14.py"
+  else
+    echo
+    echo "FATAL: configs_e14_*.txt do not match prereg_e14.py. Nothing shipped."
+    python3 "$ROOT/analysis/gen_e14_configs.py" --check 2>&1 | tail -5
+    echo "     Regenerate with: python3 analysis/gen_e14_configs.py"
+    exit 1
+  fi
+fi
 for f in "${FILES[@]}"; do
   p="$ROOT/$f"
   [ -e "$p" ] || die "missing locally: $f"
@@ -320,6 +337,54 @@ EOM
          python3 prereg_e12.py results/results/results_e12.jsonl
 EOM
     ;;
+  --e14probe)
+    # E14: PositionOnlyPendulum, the second in-scope external test. THE PROBE
+    # COMES FIRST, as for E12: 4 runs (mlp, gru128 x Easy, Hard at lambda 1.0,
+    # seed 1). Read prereg_e14.py's per-variant gates, then submit the grid
+    # for each variant that clears them. Writes results_e14.jsonl.
+    if ! python3 "$ROOT/prereg_e14.py" --check-clean "$ROOT/results/results/results_e14.jsonl"; then
+      die "E14 data already exists locally. The probe has run; collect and score it."
+    fi
+    submit lam_e14p configs_e14_probe.txt 1-4 ""
+    cat <<'EOM'
+
+     Capability probe only: mlp and gru128 at lambda 1.0, seed 1, on Easy and
+     Hard. Gates to clear before a variant's grid (prereg_e14.py):
+         G14a mlp >= 0.30    G14b gru >= 0.60    G14c gap >= 0.15
+     Collect, then:  python3 prereg_e14.py results/results/results_e14.jsonl
+     Then, per variant that clears:  --e14easy  and/or  --e14hard
+EOM
+    ;;
+  --e14easy|--e14hard)
+    # One variant's grid, in TWO arrays that skip the probe's cells (config
+    # lines 15-16 at seed 1 are the lambda 1.0 cells the probe already wrote;
+    # see analysis/gen_e14_configs.py). Same results file as the probe.
+    v="${MODE#--e14}"                        # easy | hard
+    if [ ! -f "$ROOT/results/results/results_e14.jsonl" ]; then
+      die "no local results_e14.jsonl: the probe has not been collected. Run --e14probe, collect, read the gates first."
+    fi
+    # The grid is submitted only for a variant whose three gates PASS in the
+    # frozen scorer's own output. Not a courtesy check: E11 spent 119
+    # core-hours on a grid whose gates then failed.
+    S=$([ "$v" = easy ] && echo Easy || echo Hard)
+    VLINE=$(python3 "$ROOT/prereg_e14.py" "$ROOT/results/results/results_e14.jsonl" 2>/dev/null | grep '^VERDICTS:' | tail -1)
+    for g in a b c; do
+      case "$VLINE" in
+        *"'G14${g}-${S}': 'PASS'"*) echo "     ok  G14${g}-${S} PASS" ;;
+        *) die "G14${g}-${S} is not PASS in prereg_e14.py's scoring of the collected probe:
+     ${VLINE:-<no VERDICTS line>}
+     The ${v} grid is not submitted." ;;
+      esac
+    done
+    submit "lam_e14${v:0:1}a" "configs_e14_${v}.txt" 1-14 ""
+    submit "lam_e14${v:0:1}b" "configs_e14_${v}.txt" 17-80 ""
+    cat <<EOM
+
+     E14 ${v} grid: 14 + 64 = 78 tasks, plus the probe's 2 = 80 cells.
+     Scoring (refuses until every gated-in variant is complete):
+         python3 prereg_e14.py results/results/results_e14.jsonl
+EOM
+    ;;
   --e11)
     # E11: BattleshipEasy, the closed-loop POPGym arm. Writes results_e11.jsonl.
     if ! python3 "$ROOT/prereg_e11.py" >/dev/null 2>&1; then
@@ -378,6 +443,9 @@ EOM
          bash myriad/deploy.sh $USER_NAME --e11     80 runs, Battleship closed-loop
          bash myriad/deploy.sh $USER_NAME --e12probe  2 runs, capability probe FIRST
          bash myriad/deploy.sh $USER_NAME --e12     80 runs, only after the probe clears
+         bash myriad/deploy.sh $USER_NAME --e14probe  4 runs, Pendulum probe FIRST
+         bash myriad/deploy.sh $USER_NAME --e14easy  78 runs, only if Easy clears its gates
+         bash myriad/deploy.sh $USER_NAME --e14hard  78 runs, only if Hard clears its gates
 EOM
     ;;
 esac
