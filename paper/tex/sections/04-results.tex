@@ -1,10 +1,11 @@
 \section{Results}
 \label{sec:results}
 
-We report every registered prediction. Of 25 scored, 11 passed and 14
-failed; capability gates are tallied separately (7 passed, 2 failed)
+We report every registered prediction. Of 39 scored, 18 passed and 21
+failed, and one (P22.2) is unscored by design; capability gates are tallied
+separately (22 passed, 2 failed)
 because a failed gate means the predictions behind it are \emph{not
-scored} rather than refuted. The ledger is Table 3. The failures are not
+scored} rather than refuted. The ledger is Table~\ref{tab:ledger}. The failures are not
 incidental to the results --- three of them are the mechanism by which
 the paper's scope claim is tested, and the one that cost the most
 produced the paper's strongest prediction.
@@ -65,6 +66,78 @@ on \textbf{all four} instances, with absolute differences of 0.00021,
 locations, at one to two orders of magnitude inside its own tolerance.
 This is the paper's central empirical result.
 
+\subsection{Registered controls on the trained learner}
+\label{sec:controls}
+% CLAUDE 2026-10-06: verdict lines verbatim from results/logs/run_e1N_campaign*.log;
+% every number below is printed by the frozen scorer. The reading of these
+% four results against E7/E10/E13 is in e17-pilot-findings.md and HANDOVER.md
+% section 6; the prose here is a factual draft for the author to rewrite.
+
+Four experiments registered on 5 October 2026 and run on 6 October
+(\texttt{prereg\_e15.py}, \texttt{prereg\_e16.py}, \texttt{prereg\_e18.py},
+\texttt{prereg\_e19.py}; no pre-run commit exists for them, which
+\texttt{PROVENANCE.md} \S6 records together with what does support their
+freeze) ask what the trained learner does on the in-domain instance below the
+knee, where E7 found it away from $k_{\mathrm{AC}}$.
+
+\textbf{Learned exploration scale (E15).} Releasing the exploration scale
+$\sigma$ that E6--E10 pinned at $0.3$ and letting the memoryless agent learn
+it (40 runs, eight $\lambda$), the gate passed ($J(1.0)$ within 0.4\% of
+$J_{\mathrm{ml}}$; G15) and the two direction predictions passed:
+$J(0.9)-J(1.0) = +0.0951$, 95\% CI $[+0.0866, +0.1191]$ (P18.1), and the gain
+at $\lambda\in\{0.8, 0.9\}$ exceeds the gain at $\lambda=1$ by $+27.9$, CI
+$[+17.2, +32.6]$ (P18.2). The knee prediction at the measured $\sigma$ failed
+by 0.0011 beyond its tolerance: $\lambda_{1/2}$ measured 0.98023 against
+0.99132 predicted at the learned $\sigma$ ($|\Delta| = 0.01109 > 0.01$;
+P18.3). The learned $\sigma$ rises monotonically from 0.036 at
+$\lambda\in\{0.8, 0.9\}$ to 0.138 at $\lambda=1$, a diagnostic the file
+records and does not score. Verbatim: \texttt{VERDICTS: \{'G15': 'PASS', 'P18.1': 'PASS', 'P18.2': 'PASS', 'P18.3': 'FAIL'\}}.
+
+\textbf{Memory architectures in-domain (E16).} Frame stacks of 8 and 64
+observations and a GRU-128, trained on the same instance at pinned $\sigma$
+(120 runs). All three gates passed --- each matches the memoryless optimum at
+$\lambda=1$ ($E(1.0) = 0.928$, $0.951$, $0.940$ against $\le 0.98$) --- and
+all three predictions failed: $E(0.9)/E(1.0) = 7.31$, $38.5$ and $1.92$
+against the registered $\le 1.1$ (P19.1); below the knee the cell-median
+fraction of late training spent above twice the memoryless-optimal cost
+reaches 0.69, 0.46 and 0.88 against $\le 0.05$, and is 0.00 for every
+architecture at $\lambda\ge0.98$ (P19.2); and no architecture holds its
+below-knee penalty to half the memoryless agent's at all three $\lambda$
+(P19.3). Above the knee every architecture sits at $E = 0.93$--$1.07$.
+Verbatim: \texttt{VERDICTS: \{'G16-stack8': 'PASS', 'G16-stack64': 'PASS', 'G16-gru128': 'PASS', 'P19.1': 'FAIL', 'P19.2': 'FAIL', 'P19.3': 'FAIL'\}}.
+
+\textbf{The continuing objective (E18).} E7's cost-law test re-run on
+\texttt{g1\_h0.05} under the continuing objective the theory analyses, with the
+1024-step episode resets removed (40 memoryless runs; two dated pre-data
+amendments restrict it to one instance and add unscored critic diagnostics).
+The gate passed ($E(1.0) = 0.995$; G18). The measured knee moved from E7's
+0.868 to 0.915 against the frozen 0.984 ($|\Delta| = 0.069 > 0.01$; P22.1
+fails); the below-knee plateau cost is $3.08\times$ the equilibrium cost
+against a 10\% tolerance (P22.3 fails); P22.2, an ordering across instances,
+is unscored by design. Verbatim: \texttt{VERDICTS: \{'G18-GLEAM\_g1\_h0.05': 'PASS', 'P22.1': 'FAIL', 'P22.2': 'NOT SCORED', 'P22.3': 'FAIL'\}}.
+
+\textbf{The critic swap (E19).} The exact LSTD($\lambda$) value of
+\S\ref{sec:theory} substituted for PPO's trained critic inside the GAE, the
+one-parameter linear arm trained from $0.5\times$ and $1.5\times
+k_{\mathrm{AC}}$ under continuing training on two instances at
+$\lambda\in\{0.9, 0.95\}$, three seeds per cell (48 runs). All four mobility
+gates passed (largest median drift 15.4, 13.2, 12.2 and 8.6 against $\ge1.0$).
+With the exact critic the arm moves toward $k_{\mathrm{AC}}$ from both sides in
+every cell (on \texttt{g1\_h0.05}, $\lambda=0.9$: $10.27\to18.05$ and
+$30.82\to21.95$ around $k_{\mathrm{AC}}=20.55$; P23.1) and in every cell
+without overshoot (P23.3); with PPO's own critic it drifts to under-control
+from below in every cell ($10.27\to1.14$ on the same cell; P23.2). The trained
+critic's fitted value curvature is $+0.03$ to $+0.12$ where the exact critic's
+is $-\theta_2 = O(10^2)$, a diagnostic the file records and does not score. E19
+was run twice: the runner had rounded the first run's start gains to six
+significant figures, the frozen scorer matched no cell, and that run was
+archived unscored before the corrected re-run (\texttt{PROVENANCE.md} \S6).
+Verbatim: \texttt{VERDICTS: \{'G19-GLEAM\_g1\_h0.02-0.9': 'PASS', 'G19-GLEAM\_g1\_h0.02-0.95': 'PASS', 'G19-GLEAM\_g1\_h0.05-0.9': 'PASS', 'G19-GLEAM\_g1\_h0.05-0.95': 'PASS', 'P23.1': 'PASS', 'P23.2': 'PASS', 'P23.3': 'PASS'\}}.
+
+Read as the files registered them: the trained learner's departure from
+$k_{\mathrm{AC}}$ below the knee is not removed by memory (E16) or by the
+continuing objective (E18), and is removed by the critic (E19).
+
 \subsection{The scope law, confirmed in both
 directions}
 
@@ -108,15 +181,20 @@ signature in E12's training curves --- memoryless-arm excursions are at noise
 level and flat across $\lambda$ rather than concentrated below the knee. The
 instrument reports the effect absent, not swamped (Appendix~\ref{app:e12}).
 
-\textbf{Second in-scope external (E14, pending).}
-% ---------------------------------------------------------------------
-% SLOT: position-only Pendulum. Prereg to be frozen before any run; the
-% three registered predictions mirror P9.1-P9.3 on new dynamics (torque
-% steers a hidden angular velocity). Reported whichever way it returns.
-% Fill from prereg_e14.py's VERDICTS line; do not paraphrase.
-% ---------------------------------------------------------------------
-\textbf{[E14 --- RESULT PENDING. Position-only Pendulum, preregistered
-replication of the in-scope external test on independent dynamics.]}
+\textbf{Second in-scope external (E14).} On position-only Pendulum, where
+torque steers a hidden angular velocity, all six per-variant capability gates
+passed (Easy: mlp 0.3663, gru 0.9018, gap $+0.5355$; Hard: mlp 0.3615, gru
+0.7907, gap $+0.4292$) and two of the three registered predictions passed. The
+memoryless architecture's score steps down from above the knee bracket
+$[0.948, 0.979]$ to below it (Easy $-0.0245$, 95\% CI $[-0.0290, -0.0137]$;
+Hard $-0.0066$, CI $[-0.0106, -0.0014]$; P17.1), and above the bracket it is
+equivalent to $\lambda=1$ within the registered $\pm0.05$ (pooled $-0.0026$,
+CI $[-0.0096, +0.0123]$, and $-0.0022$, CI $[-0.0072, +0.0022]$; largest
+single-cell deviations 0.0064 and 0.0048; P17.2). The memory architecture's
+across-seed variance is ordered low-$\lambda$ over high-$\lambda$ on Easy
+(ratio 23.41) but not on Hard (ratio 0.06); the pooled ratio 2.17 clears the
+registered 2.0 and the registered ordering in every variant does not hold, so
+P17.3 fails. Frozen scorer, verbatim: \texttt{VERDICTS: \{'G14a-Easy': 'PASS', 'G14b-Easy': 'PASS', 'G14c-Easy': 'PASS', 'G14a-Hard': 'PASS', 'G14b-Hard': 'PASS', 'G14c-Hard': 'PASS', 'P17.1': 'PASS', 'P17.2': 'PASS', 'P17.3': 'FAIL'\}}.
 
 \subsection{Generality beyond the minimal instance}
 
@@ -213,30 +291,37 @@ away.
 id & claim & verdict & id & claim & verdict \\
 \midrule
 G2 & POPGym gaps shrink at $\lambda{=}0.9$ & \textbf{F} &
-P10.3 & two-threshold gap widens & \textbf{F} \\
-G3 & $\lambda$-sweep classifies memory-need & \textbf{F} &
 P11.1--.2 & equilibrium holds; cost law at $k_{\mathrm{AC}}$ & \textbf{F}$\times$2 \\
-P6.1 & below-horizon gain lands at $k_{\mathrm{AC}}$ & \textbf{F} &
+G3 & $\lambda$-sweep classifies memory-need & \textbf{F} &
 P11.3 & $\lambda_{1/2}$ within 0.01, four instances & P \\
-P6.2 & cost ratio $\ge1.25\times$ & P (2.63) &
+P6.1 & below-horizon gain lands at $k_{\mathrm{AC}}$ & \textbf{F} &
 P11.4 & kicked-bias decay pattern & \textbf{F} (26/29) \\
-P6.3 & decoupled arm flat in $\lambda$ & P &
+P6.2 & cost ratio $\ge1.25\times$ & P (2.63) &
 P13.1 & diagnostic specificity, prospective & P \\
-P6.4 & arm ratio $\ge3$ & P (3.52) &
+P6.3 & decoupled arm flat in $\lambda$ & P &
 P15.1--.3 & $\lambda$-dependence, MineSweeperMedium & \textbf{F}$\times$3 \\
-P7.1--.3 & $\lambda_{1/2}$ from trained agents & \textbf{F}$\times$3 &
+P6.4 & arm ratio $\ge3$ & P (3.52) &
 P16.1--.2 & $\lambda_{1/2}$ under cubic damping & P$\times$2 \\
+P7.1--.3 & $\lambda_{1/2}$ from trained agents & \textbf{F}$\times$3 &
+P17.1--.3 & Pendulum (E14) & P$\times$2, \textbf{F} \\
 P9.1--.3 & CartPole step-down, absence, variance & P$\times$3 &
-P17.1--.3 & Pendulum (E14) & \textit{pending} \\
+P18.1--.3 & learned $\sigma$ (E15) & P$\times$2, \textbf{F} \\
 P10.1 & onset bracket contains $\lambda^\ast$ & \textbf{F} (2/3) &
-& & \\
-P10.2 & onset ordering in $\gamma h$ & P & & & \\
+P19.1--.3 & memory arms in-domain (E16) & \textbf{F}$\times$3 \\
+P10.2 & onset ordering in $\gamma h$ & P &
+P22.1, .3 & continuing objective (E18) & \textbf{F}$\times$2 \\
+P10.3 & two-threshold gap widens & \textbf{F} &
+P23.1--.3 & exact critic, both sides (E19) & P$\times$3 \\
 \bottomrule
 \end{tabular}
 \caption{Every registered prediction and its verdict as scored by the frozen
-file (P = pass, \textbf{F} = fail): 11 passed, 14 failed, 25 scored, E14
-pending. Capability gates, reported separately: G1a--c pass (pilot),
-G11a--b \textbf{fail} (E11; P12.1--P12.3 therefore not scored), G12a--c pass
-(E12), G13 pass (E13). Generated by \texttt{analysis/recount\_ledger.py}.}
+file (P = pass, \textbf{F} = fail): 18 passed, 21 failed, 39 scored; P22.2
+(E18, an ordering across instances) is unscored by design, the experiment
+having been registered on one instance. Capability gates, reported separately:
+G1a--c pass (pilot), G11a--b \textbf{fail} (E11; P12.1--P12.3 therefore not
+scored), G12a--c pass (E12), G13 pass (E13), G14a--c pass on both Pendulum
+variants (E14), G15 pass (E15), G16 pass for all three memory arms (E16), G18
+pass (E18), G19 pass at all four cells (E19). Generated by
+\texttt{analysis/recount\_ledger.py}.}
 \label{tab:ledger}
 \end{table}

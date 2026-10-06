@@ -72,11 +72,19 @@ preregistration files, with deployment checks for unset constants and explicit
 checks for existing data. These checks do not retrospectively authenticate
 freeze dates; limits of the saved chronology and post-data scorer amendments
 are disclosed in \S\ref{sec:discussion}.
-Of twenty-five scored predictions, eleven passed, fourteen failed, and
-every one is reported (Table~\ref{tab:ledger}). Most of the failures are the
+% CLAUDE 2026-10-06: counts regenerated from analysis/recount_ledger.py
+% (18 pass / 21 fail of 39; P22.2 NOT SCORED by design); the clause on the
+% October controls was added with them -- rephrase freely.
+Of thirty-nine scored predictions, eighteen passed, twenty-one failed, and
+every one is reported (Table~\ref{tab:ledger}); one further prediction is
+unscored by design. Most of the failures are the
 scope proposition doing its job on the wrong side of its boundary, or a
 location prediction the theory itself marks as fragile; three are genuine
-misses of the mechanism claim, handled by the rule above. Capability gates are
+misses of the mechanism claim, handled by the rule above; six belong to the
+registered controls of \S\ref{sec:controls}, which test whether memory, the
+training objective or the critic accounts for the trained learner's departure
+from $k_{\mathrm{AC}}$ below the knee, and one is a variance ordering that
+held on one Pendulum variant and not the other. Capability gates are
 reported separately in both directions, because a failed gate means a
 prediction was not scored, not that it was refuted. The preregistration is
 how the theory was tested, not what the paper claims; the audit's history,
