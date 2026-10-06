@@ -1,0 +1,6 @@
+host      : Idils-MacBook-Pro.local (local, arm64)
+task      : 48 -> ('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 3
+args      : --env GLEAM_g1_h0.05 --arch linear --gae-lambda 0.95 --gamma 0.9975031223974601 --fix-sigma 0.3 --linear-gain-init 26.506 --gleam-episode-len 10000000 --log-critic-fit 1 --total-timesteps 15000000 --results-name results_e19.jsonl
+starting  : 2026-10-06T16:43:34Z
+{"run": "GLEAM_g1_h0.05_linear_default_lam0.95_above_k26.506_s3", "env": "GLEAM_g1_h0.05", "arch": "linear", "lam": 0.95, "seed": 3, "final_return": NaN, "deployed_return": -0.2922956124186235, "gap_value": -2.3086343957879745, "gap_lambda": -2.1982743457048883, "total_timesteps": 15000000, "gamma": 0.9975031223974601, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 511.8, "linear_gain_init": 26.506, "linear_sgd_lr": 0.0, "gleam_episode_len": 10000000, "critic_fit": [-9.023205368006181, 0.10603465747316171, 0.04967184452035907], "v_var": 0.0009063611410046184, "final_gain": 17.928787234904664, "J_rate": 0.2922956124186235, "excess_cost": 1.3310670132841653, "fix_sigma": 0.3, "ref_J_opt": 0.19891439813923634, "ref_k_ml": 1.6490013359760836, "ref_J_ml": 0.2195949636656064, "ref_k_AC": 24.793797152108077, "ref_J_AC": 0.29639043021265854, "ref_rThK0": 0.3, "arm": "coupled"}
+finished  : 2026-10-06T16:52:07Z  rc=0  wall=513s

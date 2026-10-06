@@ -67,11 +67,12 @@ unstable side of a perturbation-decay test pass, the location and the stable
 side miss their registered thresholds --- and a rule fixed before the data
 existed demotes it to a suggestive calculation. We report it as such.
 
-\paragraph{Method.} Every claim above was frozen as an executable
-preregistration --- constants and scoring functions in a Python file whose
-freeze is machine-checked at deployment and which refuses to score data that
-already existed when it was frozen --- before the data that tests it existed.
-Twenty-five predictions were registered; eleven passed, fourteen failed, and
+\paragraph{Method.} Registered predictions are recorded in executable
+preregistration files, with deployment checks for unset constants and explicit
+checks for existing data. These checks do not retrospectively authenticate
+freeze dates; limits of the saved chronology and post-data scorer amendments
+are disclosed in \S\ref{sec:discussion}.
+Of twenty-five scored predictions, eleven passed, fourteen failed, and
 every one is reported (Table~\ref{tab:ledger}). Most of the failures are the
 scope proposition doing its job on the wrong side of its boundary, or a
 location prediction the theory itself marks as fragile; three are genuine
@@ -94,6 +95,6 @@ including the two experiments whose design errors we own, is in the appendix.
   split --- cost and thresholds versus equilibrium location --- that
   organises the results.
 \item \textbf{The audit as an artifact.} Executable preregistrations with
-  machine-checked freezes, disclosed amendments, a released diagnostic, and a
+  deployment checks, disclosed amendments, a released diagnostic, and a
   ledger of every registered outcome, released with the testbed and harness.
 \end{enumerate}

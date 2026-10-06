@@ -1,0 +1,86 @@
+18:06:07 E19: 48 of 48 cells to run on 8 workers (host Idils-MacBook-Pro.local)
+18:14:42 task 5 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 2) done in 8.6 min [1/48]
+18:14:48 task 6 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 3) done in 8.7 min [2/48]
+18:14:50 task 3 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 3) done in 8.7 min [3/48]
+18:14:52 task 1 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 1) done in 8.7 min [4/48]
+18:14:52 task 4 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 1) done in 8.7 min [5/48]
+18:14:53 task 7 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 1) done in 8.8 min [6/48]
+18:14:53 task 8 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 2) done in 8.8 min [7/48]
+18:14:56 task 2 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 2) done in 8.8 min [8/48]
+18:23:20 task 10 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 1) done in 8.5 min [9/48]
+18:23:21 task 11 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 2) done in 8.5 min [10/48]
+18:23:23 task 9 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 3) done in 8.7 min [11/48]
+18:23:23 task 16 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 1) done in 8.5 min [12/48]
+18:23:26 task 12 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 3) done in 8.6 min [13/48]
+18:23:32 task 13 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 1) done in 8.7 min [14/48]
+18:23:34 task 14 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 2) done in 8.7 min [15/48]
+18:23:36 task 15 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 3) done in 8.7 min [16/48]
+18:31:51 task 18 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 3) done in 8.5 min [17/48]
+18:31:51 task 17 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 2) done in 8.5 min [18/48]
+18:32:02 task 19 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 1) done in 8.6 min [19/48]
+18:32:03 task 20 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 2) done in 8.7 min [20/48]
+18:32:04 task 23 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 2) done in 8.5 min [21/48]
+18:32:05 task 21 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 3) done in 8.6 min [22/48]
+18:32:07 task 24 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 3) done in 8.5 min [23/48]
+18:32:07 task 22 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 1) done in 8.6 min [24/48]
+18:40:26 task 26 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 2) done in 8.6 min [25/48]
+18:40:26 task 25 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 1) done in 8.6 min [26/48]
+18:40:31 task 28 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 1) done in 8.5 min [27/48]
+18:40:32 task 30 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 3) done in 8.5 min [28/48]
+18:40:33 task 29 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 2) done in 8.5 min [29/48]
+18:40:40 task 27 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 3) done in 8.6 min [30/48]
+18:40:42 task 32 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 2) done in 8.6 min [31/48]
+18:40:43 task 31 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 1) done in 8.6 min [32/48]
+18:48:56 task 35 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 2) done in 8.4 min [33/48]
+18:48:59 task 33 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 3) done in 8.5 min [34/48]
+18:49:00 task 34 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 1) done in 8.6 min [35/48]
+18:49:01 task 36 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 3) done in 8.5 min [36/48]
+18:49:08 task 37 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 1) done in 8.6 min [37/48]
+18:49:11 task 40 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 1) done in 8.5 min [38/48]
+18:49:14 task 39 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 3) done in 8.5 min [39/48]
+18:49:15 task 38 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 2) done in 8.6 min [40/48]
+18:57:21 task 41 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 2) done in 8.4 min [41/48]
+18:57:30 task 42 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 3) done in 8.5 min [42/48]
+18:57:35 task 43 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 1) done in 8.6 min [43/48]
+18:57:36 task 44 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 2) done in 8.6 min [44/48]
+18:57:37 task 48 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 3) done in 8.4 min [45/48]
+18:57:37 task 47 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 2) done in 8.4 min [46/48]
+18:57:40 task 45 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 3) done in 8.5 min [47/48]
+18:57:41 task 46 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 1) done in 8.5 min [48/48]
+18:57:41 finished, 0 failure(s); scoring
+==============================================================================
+ E19 critic swap: oracle LSTD(lambda) critic vs PPO's default critic, linear arm, continuing training
+==============================================================================
+GLEAM_g1_h0.02 lambda 0.9 (k_AC 57.81; starts 28.90 / 86.71): G19 max |median drift| 15.40 (>= 1.0) -> PASS
+    default  from above: median drift  -15.40; end gains [71.28, 71.32, 71.44]
+    oracle   from above: median drift  -15.17; end gains [71.41, 71.55, 71.61]
+    default  from below: median drift   -6.90; end gains [21.97, 22.01, 22.25]
+    oracle   from below: median drift  +11.86; end gains [40.74, 40.76, 40.87]
+GLEAM_g1_h0.02 lambda 0.95 (k_AC 54.14; starts 27.07 / 81.21): G19 max |median drift| 13.19 (>= 1.0) -> PASS
+    default  from above: median drift  -13.19; end gains [67.96, 68.03, 68.13]
+    oracle   from above: median drift  -12.17; end gains [68.88, 69.04, 69.08]
+    default  from below: median drift   -3.63; end gains [23.38, 23.44, 23.66]
+    oracle   from below: median drift   +7.64; end gains [34.69, 34.71, 34.79]
+GLEAM_g1_h0.05 lambda 0.9 (k_AC 20.55; starts 10.27 / 30.82): G19 max |median drift| 12.24 (>= 1.0) -> PASS
+    default  from above: median drift  -12.24; end gains [18.57, 18.58, 18.58]
+    oracle   from above: median drift   -8.87; end gains [21.91, 21.95, 21.99]
+    default  from below: median drift   -9.13; end gains [1.05, 1.14, 1.29]
+    oracle   from below: median drift   +7.77; end gains [18.04, 18.05, 18.06]
+GLEAM_g1_h0.05 lambda 0.95 (k_AC 17.67; starts 8.84 / 26.51): G19 max |median drift| 8.58 (>= 1.0) -> PASS
+    default  from above: median drift   -8.58; end gains [17.89, 17.93, 17.93]
+    oracle   from above: median drift   -5.57; end gains [20.89, 20.93, 20.97]
+    default  from below: median drift   -5.39; end gains [3.41, 3.45, 3.65]
+    oracle   from below: median drift   +4.46; end gains [13.26, 13.29, 13.3]
+
+  GLEAM_g1_h0.02 lambda 0.9: P23.1 attraction ok (oracle below +11.86, above -15.17); P23.2 default below -6.90 ok; P23.3 approach 28.90 < 40.76 < 57.81 < 71.55 < 86.71 ok
+  GLEAM_g1_h0.02 lambda 0.95: P23.1 attraction ok (oracle below +7.64, above -12.17); P23.2 default below -3.63 ok; P23.3 approach 27.07 < 34.71 < 54.14 < 69.04 < 81.21 ok
+  GLEAM_g1_h0.05 lambda 0.9: P23.1 attraction ok (oracle below +7.77, above -8.87); P23.2 default below -9.13 ok; P23.3 approach 10.27 < 18.05 < 20.55 < 21.95 < 30.82 ok
+  GLEAM_g1_h0.05 lambda 0.95: P23.1 attraction ok (oracle below +4.46, above -5.57); P23.2 default below -5.39 ok; P23.3 approach 8.84 < 13.29 < 17.67 < 20.93 < 26.51 ok
+  diagnostic GLEAM_g1_h0.02 lambda 0.9: default critic fitted curvature c, median +0.112 (range +0.061..+0.175); the LSTD critic's is -theta2, O(1e2)
+  diagnostic GLEAM_g1_h0.02 lambda 0.95: default critic fitted curvature c, median +0.119 (range +0.065..+0.189); the LSTD critic's is -theta2, O(1e2)
+  diagnostic GLEAM_g1_h0.05 lambda 0.9: default critic fitted curvature c, median +0.027 (range +0.007..+0.049); the LSTD critic's is -theta2, O(1e2)
+  diagnostic GLEAM_g1_h0.05 lambda 0.95: default critic fitted curvature c, median +0.032 (range +0.013..+0.054); the LSTD critic's is -theta2, O(1e2)
+P23.1: PASS   P23.2: PASS   P23.3: PASS
+
+VERDICTS: {'G19-GLEAM_g1_h0.02-0.9': 'PASS', 'G19-GLEAM_g1_h0.02-0.95': 'PASS', 'G19-GLEAM_g1_h0.05-0.9': 'PASS', 'G19-GLEAM_g1_h0.05-0.95': 'PASS', 'P23.1': 'PASS', 'P23.2': 'PASS', 'P23.3': 'PASS'}
+

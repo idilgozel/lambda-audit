@@ -41,6 +41,9 @@ _CACHE = None
 # before stepping, which is standard continuous PPO practice and keeps an
 # unbounded Gaussian from walking the state to infinity.
 ACT_LIMIT = 40.0
+# E17 (2026-10-05): training-time episode length override. None keeps the
+# shipped 1024-step truncation; ppo_lambda.py sets it from --gleam-episode-len.
+EPISODE_LEN = None
 
 
 def _load():
@@ -144,7 +147,7 @@ class GleamNative:
 
 def _entry(instance, coupled):
     def make():
-        return GleamNative(instance, coupled=coupled)
+        return GleamNative(instance, coupled=coupled, episode_len=EPISODE_LEN)
     return make
 
 

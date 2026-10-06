@@ -466,6 +466,15 @@ def evaluate_continuous(agent, env_id, stack, seed, gamma, device,
                 gap_l = float((np.array(gl) - gs_arr).mean() / sd)
         else:
             gap_v, gap_l = 0.0, 0.0
+        # E17 (2026-10-05): the curvature the critic actually learned, fitted
+        # over the deployed trajectory. Diagnostic; written only with --log-critic-fit.
+        if len(ep_v) >= 100 and len(obs_v) >= len(ep_v):
+            vv = np.asarray(obs_v[:len(ep_v)], dtype=np.float64)
+            yy = np.asarray(ep_v, dtype=np.float64)
+            A = np.stack([np.ones_like(vv), vv, vv * vv], 1)
+            coef = np.linalg.lstsq(A, yy, rcond=None)[0]
+            ctrl["critic_fit"] = [float(c) for c in coef]
+            ctrl["v_var"] = float(vv.var())
     return mean_ret, gap_v, gap_l, ctrl
 
 
@@ -628,6 +637,18 @@ def parse_args():
     p.add_argument("--linear-gain-scale", type=float, default=1.0)
     p.add_argument("--linear-gain-init", type=float, default=0.0)
     p.add_argument("--linear-bias-init", type=float, default=0.0)
+    # E17 (2026-10-05): vanilla SGD on the gain of a linear arm, Adam elsewhere.
+    # 0.0 (default) leaves the published optimiser untouched.
+    p.add_argument("--linear-sgd-lr", type=float, default=0.0)
+    # E17 (2026-10-05): continuing training for GLEAM. 0 (default) keeps the
+    # shipped 1024-step episodes; a value above the per-env step budget means
+    # no reset ever happens and the trained objective is the continuing one.
+    p.add_argument("--gleam-episode-len", type=int, default=0)
+    # E17 (2026-10-05): record the quadratic fit of the critic along the deployed trajectory.
+    p.add_argument("--log-critic-fit", type=int, default=0)
+    # E17 (2026-10-05): replace the critic's values in the GAE by the exact LSTD(lambda)
+    # aliased quadratic value at the current gain (linear arms on GLEAM only).
+    p.add_argument("--oracle-critic", type=str, default="", choices=["", "lstd"])
     # Continuous evaluation only. One long trajectory, burn-in discarded, so
     # the reported cost is a stationary estimate rather than an average over
     # repeated settling transients. Discrete evaluation ignores both.
@@ -651,6 +672,30 @@ def main():
         raise SystemExit(
             "REFUSING TO RUN. --arch linear must not write into "
             f"{args.results_name}. Pass --results-name results_tier1b.jsonl.")
+    if args.gleam_episode_len:
+        if gleam_native is None:
+            raise SystemExit("--gleam-episode-len needs gleam_native")
+        gleam_native.EPISODE_LEN = int(args.gleam_episode_len)
+    oracle = None
+    if args.oracle_critic == "lstd":
+        if gleam_native is None or not args.arch.startswith("linear") or args.fix_sigma is None:
+            raise SystemExit("--oracle-critic lstd is defined for --arch linear/linearb on GLEAM with --fix-sigma.")
+        import sys as _sys
+        _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "vendor", "gleam"))
+        import kernel_general as _kg
+        from gleam_bench import GLEBench as _GLEBench
+        _ip = gleam_native.instance_params(args.env.replace("_dec", "").split("_nl")[0])
+        _bench = _GLEBench(cs=(_ip["c"],), gammas=(_ip["gamma_bath"],), theta=_ip["theta"], h=_ip["h"])
+        _s_e = float(args.fix_sigma) ** 2
+        _state = {"k": None, "th2": 0.0}
+
+        def oracle(agent_, obs):
+            """-theta2(k, lambda) * v^2 at the arm's current gain (recomputed when k moves)."""
+            k = -float(agent_.actor.weight.detach().reshape(-1)[0].item()) * agent_.gain_scale
+            if _state["k"] is None or abs(k - _state["k"]) > 1e-9:
+                th2 = float(_kg.theta2(_bench, k, args.gae_lambda, _s_e)) if k > 0 else float("nan")
+                _state["k"], _state["th2"] = k, (th2 if th2 == th2 else 0.0)
+            return -_state["th2"] * obs[:, 0] ** 2
     torch.set_num_threads(args.torch_threads)
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -670,7 +715,17 @@ def main():
                   gain_scale=args.linear_gain_scale,
                   gain_init=args.linear_gain_init,
                   bias_init=args.linear_bias_init).to(device)
-    opt = optim.Adam(agent.parameters(), lr=args.lr, eps=1e-5)
+    if args.linear_sgd_lr > 0:
+        if not agent.linear_policy:
+            raise SystemExit("--linear-sgd-lr is defined for --arch linear/linearb only.")
+        _other = [q for n, q in agent.named_parameters() if n != "actor.weight"]
+        opt = optim.Adam(_other, lr=args.lr, eps=1e-5)
+        opt_k = optim.SGD([agent.actor.weight], lr=args.linear_sgd_lr)
+        clip_params = _other
+    else:
+        opt = optim.Adam(agent.parameters(), lr=args.lr, eps=1e-5)
+        opt_k = None
+        clip_params = list(agent.parameters())
 
     batch = args.num_envs * args.num_steps
     minibatch_envs = max(1, args.num_envs // args.num_minibatches)
@@ -701,6 +756,8 @@ def main():
         if args.anneal_lr:
             frac = 1.0 - (update - 1.0) / updates
             opt.param_groups[0]["lr"] = frac * args.lr
+            if opt_k is not None:
+                opt_k.param_groups[0]["lr"] = frac * args.linear_sgd_lr
         init_h = h.clone()
 
         for step in range(args.num_steps):
@@ -709,6 +766,8 @@ def main():
             dones[step] = next_done
             with torch.no_grad():
                 a, lp, _, v, h = agent.act(next_obs, h, next_done)
+                if oracle is not None:
+                    v = oracle(agent, next_obs)
             acts[step], logps[step], vals[step] = a, lp, v
             nxt, r, term, trunc, final = envs.step(a.numpy())
             rews[step] = torch.tensor(r)
@@ -718,12 +777,16 @@ def main():
                 with torch.no_grad():
                     fv = agent.value(torch.tensor(final, dtype=torch.float32),
                                      h, torch.zeros(args.num_envs))
+                    if oracle is not None:
+                        fv = oracle(agent, torch.tensor(final, dtype=torch.float32))
                 rews[step] += torch.tensor(trunc) * args.gamma * fv
             next_obs = torch.tensor(nxt, dtype=torch.float32)
             next_done = torch.tensor(d, dtype=torch.float32)
 
         with torch.no_grad():
             next_val = agent.value(next_obs, h, next_done)
+            if oracle is not None:
+                next_val = oracle(agent, next_obs)
             adv = torch.zeros_like(rews)
             lastgae = 0
             for t in reversed(range(args.num_steps)):
@@ -767,9 +830,13 @@ def main():
                 vloss = 0.5 * torch.max(v_un, v_cl).mean()
                 loss = pg - args.ent_coef * ent.mean() + args.vf_coef * vloss
                 opt.zero_grad()
+                if opt_k is not None:
+                    opt_k.zero_grad()
                 loss.backward()
-                nn.utils.clip_grad_norm_(agent.parameters(), args.max_grad_norm)
+                nn.utils.clip_grad_norm_(clip_params, args.max_grad_norm)
                 opt.step()
+                if opt_k is not None:
+                    opt_k.step()
 
         h = h.detach()
         train_ret = float(np.mean(envs.returns_log)) if envs.returns_log else float("nan")
@@ -808,6 +875,19 @@ def main():
     }
     if agent.linear_policy and agent.actor.bias is not None:
         row["final_bias"] = float(agent.actor.bias.item()) * agent.gain_scale
+    if agent.linear_policy:
+        # E17 (2026-10-05): the starting gain is part of the cell for a
+        # drift-direction run, and the gain optimiser is part of the arm.
+        # Linear arms only; no other row changes.
+        row["linear_gain_init"] = float(args.linear_gain_init)
+        row["linear_sgd_lr"] = float(getattr(args, "linear_sgd_lr", 0.0))
+    if args.gleam_episode_len:
+        row["gleam_episode_len"] = int(args.gleam_episode_len)
+    if args.oracle_critic:
+        row["oracle_critic"] = args.oracle_critic
+    if args.log_critic_fit and ctrl.get("critic_fit") is not None:
+        row["critic_fit"] = ctrl["critic_fit"]
+        row["v_var"] = ctrl["v_var"]
     if envs.continuous:
         # Control diagnostics. None on discrete environments, so every pilot
         # row keeps exactly the schema it was written with.
@@ -815,6 +895,11 @@ def main():
         row["J_rate"] = ctrl["J_rate"]
         row["excess_cost"] = ctrl["excess_cost"]
         row["fix_sigma"] = args.fix_sigma
+        # E15 (2026-10-05): a LEARNED exploration scale is part of the result,
+        # since the theory takes s_e as an input. Recorded only when sigma is
+        # learned, so every pinned-sigma row (E6-E14) keeps its exact schema.
+        if not agent.fixed_sigma:
+            row["final_sigma"] = float(agent.actor_logstd.detach().exp().mean().item())
         try:
             row.update({f"ref_{k}": v for k, v in
                         gleam_native.baselines(args.env.replace("_dec", "")).items()})

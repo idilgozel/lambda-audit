@@ -1,0 +1,30 @@
+[
+ {
+  "written": "2026-10-05T12:10:38.550154+00:00",
+  "host": "Idils-MacBook-Pro.local",
+  "machine": "arm64",
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "cpu": "Apple M5 Pro",
+  "ncpu": 18,
+  "python": "3.12.14",
+  "torch": "2.14.1",
+  "numpy": "2.5.3",
+  "git_commit": "9d240035ae2948013f42d52b6289d35f65de82e9",
+  "git_dirty": "M .gitignore\n?? analysis/run_e14.py\n?? results/logs/run_e14_campaign.log",
+  "prereg_e14_md5": "9e0347e7e1e7bf21cfe8311e78464e6e"
+ },
+ {
+  "written": "2026-10-05T14:35:46.789844+00:00",
+  "host": "Idils-MacBook-Pro.local",
+  "machine": "arm64",
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "cpu": "Apple M5 Pro",
+  "ncpu": 18,
+  "python": "3.12.14",
+  "torch": "2.14.1",
+  "numpy": "2.5.3",
+  "git_commit": "9d240035ae2948013f42d52b6289d35f65de82e9",
+  "git_dirty": "M .gitignore\n M PROVENANCE.md\n M README.md\n M analysis/provenance_chronology.sh\n M e13-findings.md\n M paper/00-drafting-plan.md\n M paper/03-method.md\n M paper/tex/sections/01-introduction.tex\n M paper/tex/sections/02-testbed.tex\n M paper/tex/sections/05-discussion.tex\n M paper/tex/sections/A1-testbed-details.tex\n?? analysis/apply_final_sigma_patch.py\n?? analysis/audit_saved_evidence.py\n?? analysis/bistability.py\n?? analysis/evening_campaign.sh\n?? analysis/knee_formula.py\n?? analysis/knee_formula_table.json\n?? analysis/run_e14.py\n?? analysis/run_e15.py\n?? analysis/run_e16.py\n?? analysis/test_prereg_e15.py\n?? analysis/test_prereg_e16.py\n?? prereg_e15.py\n?? prereg_e16.py\n?? results/logs/e14_provenance.json\n?? results/logs/evening_campaign.log\n?? results/logs/lam_e14e.o202610051342.10\n?? results/logs/lam_e14e.o202610051342.11\n?? results/logs/lam_e14e.o202610051342.12\n?? results/logs/lam_e14e.o202610051342.13\n?? results/logs/lam_e14e.o202610051342.14\n?? results/logs/lam_e14e.o202610051342.24\n?? results/logs/lam_e14e.o202610051342.25\n?? results/logs/lam_e14e.o202610051342.26\n?? results/logs/lam_e14e.o202610051342.27\n?? results/logs/lam_e14e.o202610051342.28\n?? results/logs/lam_e14e.o202610051342.29\n?? results/logs/lam_e14e.o202610051342.30\n?? results/logs/lam_e14e.o202610051342.32\n?? results/logs/lam_e14e.o202610051342.40\n?? results/logs/lam_e14e.o202610051342.41\n?? results/logs/lam_e14e.o202610051342.42\n?? results/logs/lam_e14e.o202610051342.43\n?? results/logs/lam_e14e.o202610051342.44\n?? results/logs/lam_e14e.o202610051342.45\n?? results/logs/lam_e14e.o202610051342.46\n?? results/logs/lam_e14e.o202610051342.48\n?? results/logs/lam_e14e.o202610051342.56\n?? results/logs/lam_e14e.o202610051342.57\n?? results/logs/lam_e14e.o202610051342.58\n?? results/logs/lam_e14e.o202610051342.59\n?? results/logs/lam_e14e.o202610051342.60\n?? results/logs/lam_e14e.o202610051342.8\n?? results/logs/lam_e14e.o202610051342.9\n?? results/logs/lam_e14p.o202610051310.1\n?? results/logs/lam_e14p.o202610051310.2\n?? results/logs/lam_e14p.o202610051310.3\n?? results/logs/lam_e14p.o202610051310.4\n?? results/logs/run_e14_campaign.log\n?? results/logs/run_e14_campaign_b.log\n?? results/results/results_e14.jsonl",
+  "prereg_e14_md5": "9e0347e7e1e7bf21cfe8311e78464e6e"
+ }
+]

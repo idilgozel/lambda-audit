@@ -1,9 +1,16 @@
 # E13 findings: the threshold survives breaking LQG exactness
 
-Written 2026-08-21, after scoring. Prereg frozen the same day (commit
-`12ccb86`, before any run; `--check-clean` passed at run start). All 72 runs
-completed; scored by the frozen `prereg_e13.py`, verdicts quoted from its
-output.
+Date correction, 2026-10-05: the previous header said "Written 2026-08-21,
+after scoring" and identified that as the day of commit `12ccb86`. The
+preserved commit is actually 2026-08-25 19:52:20 UTC, and the first local run
+starts at 19:55:31 UTC that day. The prereg's header defines freezing at
+commit, although its draft date and `FROZEN_ON` constant say 21 August;
+those frozen contents are unchanged. No saved positive `--check-clean`
+receipt was located, so its reported invocation is not an independently
+preserved artifact. See `PROVENANCE.md` for the evidence and limits.
+
+All 72 runs have result rows matching their saved logs; verdicts below are
+quoted from the unchanged `prereg_e13.py`.
 
 ## Verdicts, as registered
 

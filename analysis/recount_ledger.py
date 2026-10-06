@@ -49,6 +49,11 @@ SCORERS = [
     ("prereg_e12.py",          [], "results_e12.jsonl",          "E12"),
     ("prereg_e13.py",          [], "results_e13.jsonl",          "E13"),
     ("prereg_e14.py",          [], "results_e14.jsonl",          "E14"),
+    # 2026-10-05: the local (Apple M5 Pro) experiments. One results file each.
+    ("prereg_e15.py",          [], "results_e15.jsonl",          "E15 learned sigma"),
+    ("prereg_e16.py",          [], "results_e16.jsonl",          "E16 memory in-domain"),
+    ("prereg_e18.py",          [], "results_e18.jsonl",          "E18 continuing objective"),
+    ("prereg_e19.py",          [], "results_e19.jsonl",          "E19 critic swap"),
 ]
 
 # Capability gates. Everything else parsed out of a VERDICTS line is a
@@ -56,6 +61,13 @@ SCORERS = [
 GATES = {"G1a", "G1b", "G1c", "G11a", "G11b", "G12a", "G12b", "G12c",
          "G13", "G14a-Easy", "G14b-Easy", "G14c-Easy",
          "G14a-Hard", "G14b-Hard", "G14c-Hard"}
+# E15-E19 (2026-10-05) name their gates G15, G16-<arch>, G18-<instance>,
+# G19-<instance>-<lambda>; every key starting with G15..G19 is a gate.
+GATE_RE = re.compile(r"^G1[5-9](-|$)")
+
+
+def is_gate(k):
+    return k in GATES or bool(GATE_RE.match(k))
 
 VERDICT_RE = re.compile(r"^VERDICTS:\s*(\{.*\})\s*$", re.M)
 # prereg_e8.py reports P13.1 on its own line rather than in a VERDICTS dict.
@@ -98,12 +110,12 @@ def collect():
             problems.append(f"{label:14} ({scorer}): {err}")
             continue
         for k, verdict in v.items():
-            (gates if k in GATES else preds)[k] = (verdict, label)
+            (gates if is_gate(k) else preds)[k] = (verdict, label)
     return preds, gates, problems
 
 
 def bucket(d):
-    out = {"PASS": [], "FAIL": [], "PARTIAL": [], "OTHER": []}
+    out = {"PASS": [], "FAIL": [], "PARTIAL": [], "NOT SCORED": [], "OTHER": []}
     for k, (verdict, _) in sorted(d.items()):
         out.get(verdict, out["OTHER"]).append(k)
     return out
@@ -118,7 +130,7 @@ def main():
     preds, gates, problems = collect()
     pb, gb = bucket(preds), bucket(gates)
     npass, nfail, npart = len(pb["PASS"]), len(pb["FAIL"]), len(pb["PARTIAL"])
-    total = npass + nfail + npart + len(pb["OTHER"])
+    total = npass + nfail + npart + len(pb["OTHER"])      # NOT SCORED is listed, not counted
 
     print("=" * 74)
     print(" REGISTERED PREDICTIONS")
@@ -126,15 +138,17 @@ def main():
     for b in ("PASS", "FAIL", "PARTIAL", "OTHER"):
         if pb[b]:
             print(f"  {b:8} {len(pb[b]):2}   {', '.join(pb[b])}")
+    if pb["NOT SCORED"]:
+        print(f"  {'NOT SCORED':10} {len(pb['NOT SCORED']):2}   {', '.join(pb['NOT SCORED'])}   (gate failed or design made it unscorable; not in the tally)")
     print(f"\n  HEADLINE: {npass} pass / {nfail} fail"
           + (f" / {npart} partial" if npart else "") + f" of {total}")
 
     print("\n" + "=" * 74)
     print(" CAPABILITY GATES (reported separately, in both directions)")
     print("=" * 74)
-    for b in ("PASS", "FAIL", "OTHER"):
+    for b in ("PASS", "FAIL", "NOT SCORED", "OTHER"):
         if gb[b]:
-            print(f"  {b:8} {len(gb[b]):2}   {', '.join(gb[b])}")
+            print(f"  {b:10} {len(gb[b]):2}   {', '.join(gb[b])}")
     if gb["FAIL"]:
         print("\n  A failed gate means the predictions behind it are NOT SCORED,")
         print("  not that they were refuted. Those must be named in the paper.")

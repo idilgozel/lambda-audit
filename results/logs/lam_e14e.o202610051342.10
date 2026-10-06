@@ -1,0 +1,6 @@
+host      : Idils-MacBook-Pro.local (local, arm64)
+task      : 10 -> config line 10, seed 1
+args      : --env PositionOnlyPendulumEasy --arch gru128 --gae-lambda 0.95 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl
+starting  : 2026-10-05T12:42:26Z
+{"run": "PositionOnlyPendulumEasy_gru128_lam0.95_s1", "env": "PositionOnlyPendulumEasy", "arch": "gru128", "lam": 0.95, "seed": 1, "final_return": 0.899268517125567, "deployed_return": 0.902299790006756, "gap_value": 0.002810004602544199, "gap_lambda": 0.004557859676251217, "total_timesteps": 15000000, "gamma": 0.99, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 1, "wallclock_s": 3125.6, "final_gain": null, "J_rate": null, "excess_cost": null, "fix_sigma": 0.5}
+finished  : 2026-10-05T13:34:33Z  rc=0  wall=3128s

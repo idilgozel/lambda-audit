@@ -16,3 +16,10 @@ __pycache__/
 .DS_Store
 *.bak-*
 .expected_md5
+.venv
+
+# Same policy for pilot curves and the archived, unscored E19 run-1 curves:
+# derived data, reproducible from the JSONL rows + harness; too large to commit.
+results/pilots_e17/curves_*.csv
+results/pilots_e17/**/curves_*.csv
+results/results/e19_run1_unscorable/curves/

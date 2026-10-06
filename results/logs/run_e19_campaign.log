@@ -1,0 +1,59 @@
+17:00:22 E19: 48 of 48 cells to run on 8 workers (host Idils-MacBook-Pro.local)
+17:08:46 task 4 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 1) done in 8.4 min [1/48]
+17:08:49 task 5 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 2) done in 8.4 min [2/48]
+17:08:50 task 6 (('GLEAM_g1_h0.02', 0.9, 'below', 'default'), seed 3) done in 8.5 min [3/48]
+17:08:56 task 7 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 1) done in 8.6 min [4/48]
+17:08:57 task 8 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 2) done in 8.6 min [5/48]
+17:08:57 task 3 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 3) done in 8.6 min [6/48]
+17:08:58 task 1 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 1) done in 8.6 min [7/48]
+17:08:59 task 2 (('GLEAM_g1_h0.02', 0.9, 'below', 'oracle'), seed 2) done in 8.6 min [8/48]
+17:17:19 task 10 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 1) done in 8.5 min [9/48]
+17:17:19 task 11 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 2) done in 8.5 min [10/48]
+17:17:24 task 9 (('GLEAM_g1_h0.02', 0.9, 'above', 'oracle'), seed 3) done in 8.6 min [11/48]
+17:17:25 task 12 (('GLEAM_g1_h0.02', 0.9, 'above', 'default'), seed 3) done in 8.5 min [12/48]
+17:17:29 task 16 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 1) done in 8.5 min [13/48]
+17:17:35 task 13 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 1) done in 8.6 min [14/48]
+17:17:36 task 14 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 2) done in 8.6 min [15/48]
+17:17:38 task 15 (('GLEAM_g1_h0.02', 0.95, 'below', 'oracle'), seed 3) done in 8.7 min [16/48]
+17:25:46 task 18 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 3) done in 8.4 min [17/48]
+17:25:48 task 17 (('GLEAM_g1_h0.02', 0.95, 'below', 'default'), seed 2) done in 8.5 min [18/48]
+17:26:00 task 19 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 1) done in 8.6 min [19/48]
+17:26:06 task 22 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 1) done in 8.5 min [20/48]
+17:26:07 task 20 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 2) done in 8.7 min [21/48]
+17:26:07 task 23 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 2) done in 8.5 min [22/48]
+17:26:09 task 21 (('GLEAM_g1_h0.02', 0.95, 'above', 'oracle'), seed 3) done in 8.7 min [23/48]
+17:26:13 task 24 (('GLEAM_g1_h0.02', 0.95, 'above', 'default'), seed 3) done in 8.6 min [24/48]
+17:34:31 task 26 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 2) done in 8.7 min [25/48]
+17:34:31 task 25 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 1) done in 8.8 min [26/48]
+17:34:39 task 30 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 3) done in 8.5 min [27/48]
+17:34:40 task 27 (('GLEAM_g1_h0.05', 0.9, 'below', 'oracle'), seed 3) done in 8.7 min [28/48]
+17:34:40 task 29 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 2) done in 8.6 min [29/48]
+17:34:42 task 28 (('GLEAM_g1_h0.05', 0.9, 'below', 'default'), seed 1) done in 8.6 min [30/48]
+17:34:54 task 31 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 1) done in 8.7 min [31/48]
+17:34:54 task 32 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 2) done in 8.7 min [32/48]
+17:43:06 task 34 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 1) done in 8.6 min [33/48]
+17:43:08 task 35 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 2) done in 8.5 min [34/48]
+17:43:10 task 33 (('GLEAM_g1_h0.05', 0.9, 'above', 'oracle'), seed 3) done in 8.7 min [35/48]
+17:43:10 task 36 (('GLEAM_g1_h0.05', 0.9, 'above', 'default'), seed 3) done in 8.5 min [36/48]
+17:43:21 task 38 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 2) done in 8.7 min [37/48]
+17:43:23 task 37 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 1) done in 8.7 min [38/48]
+17:43:26 task 40 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 1) done in 8.5 min [39/48]
+17:43:34 task 39 (('GLEAM_g1_h0.05', 0.95, 'below', 'oracle'), seed 3) done in 8.7 min [40/48]
+17:51:41 task 41 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 2) done in 8.6 min [41/48]
+17:51:42 task 42 (('GLEAM_g1_h0.05', 0.95, 'below', 'default'), seed 3) done in 8.6 min [42/48]
+17:51:49 task 43 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 1) done in 8.7 min [43/48]
+17:51:55 task 44 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 2) done in 8.7 min [44/48]
+17:51:57 task 45 (('GLEAM_g1_h0.05', 0.95, 'above', 'oracle'), seed 3) done in 8.6 min [45/48]
+17:51:59 task 46 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 1) done in 8.6 min [46/48]
+17:52:01 task 47 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 2) done in 8.6 min [47/48]
+17:52:07 task 48 (('GLEAM_g1_h0.05', 0.95, 'above', 'default'), seed 3) done in 8.5 min [48/48]
+17:52:07 finished, 0 failure(s); scoring
+==============================================================================
+ E19 critic swap: oracle LSTD(lambda) critic vs PPO's default critic, linear arm, continuing training
+==============================================================================
+GLEAM_g1_h0.02 lambda 0.9: NOT SCORABLE YET; seeds per (start, critic): below/oracle: 0, below/default: 0, above/oracle: 0, above/default: 0
+GLEAM_g1_h0.02 lambda 0.95: NOT SCORABLE YET; seeds per (start, critic): below/oracle: 0, below/default: 0, above/oracle: 0, above/default: 0
+GLEAM_g1_h0.05 lambda 0.9: NOT SCORABLE YET; seeds per (start, critic): below/oracle: 0, below/default: 0, above/oracle: 0, above/default: 0
+GLEAM_g1_h0.05 lambda 0.95: NOT SCORABLE YET; seeds per (start, critic): below/oracle: 0, below/default: 0, above/oracle: 0, above/default: 0
+VERDICTS: {}
+

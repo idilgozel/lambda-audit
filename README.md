@@ -18,24 +18,33 @@ published or under review. Results are reported as scored, including failures.
 
 ## Method
 
-Every substantive claim is frozen as an *executable* preregistration: constants
-and scoring functions live in Python files whose freeze is asserted
-mechanically, and the deployment script runs each as a pre-flight and refuses
-to submit if a check fails. Amendments are dated; post-data amendments are
+Registered predictions and scoring functions are recorded in executable
+preregistration files. Deployment checks reject unset constants, and
+`--check-clean` tests the supplied path for existing data when invoked.
+These checks do not retrospectively authenticate freeze dates; the saved
+run chronology, pre-run commits, and their limits are documented in
+`PROVENANCE.md`. Amendments are dated; post-data amendments are
 disclosed as such in the file that carries them. Scoring refuses to run on data
 with duplicated cells.
 
-Scored to date: 11 predictions passed, 14 failed, of 25 registered; capability
-gates 7 passed, 2 failed, reported separately (`python3
-analysis/recount_ledger.py` regenerates these counts from the scorers). The
-failures are part of the record and are analysed rather than removed — one of
-them (E7) produced the project's most informative result, and the E10 failures
-are diagnosed in `e10-above-knee-drift.md`. E14 (three predictions, six
-per-variant gates) is frozen and pending.
+Scored to date: 18 predictions passed, 21 failed, of 39 scored; one prediction
+(E18's P22.2) is NOT SCORED by design and sits outside the tally. Capability
+gates are counted separately: 22 passed, 2 failed (E11). Run
+`python3 analysis/recount_ledger.py` for the current generated prediction and
+gate tallies. The failures are part of the record and are analysed rather than
+removed — one of them (E7) produced the project's most informative result, and
+the E10 failures are diagnosed in `e10-above-knee-drift.md`. The October 2026
+local campaign (E14–E19; chronology in `PROVENANCE.md` §6) added the second
+external test (E14: 2 of 3), the learned-σ control (E15: 2 of 3), the in-domain
+memory arms (E16: 0 of 3), the continuing-objective re-run of the cost law
+(E18: 0 of 2 scored) and the critic swap (E19: 3 of 3 — the linear arm is
+attracted to the predicted equilibrium from both sides when PPO's GAE uses the
+exact LSTD(λ) critic, and drifts to under-control with its own trained critic);
+the reading is in `e17-pilot-findings.md`.
 
 ## Preregistrations
 
-| File | Scope | Frozen |
+| File | Scope | Declared freeze date |
 |---|---|---|
 | `prereg_lambda_pilot.py` | POPGym pilot gates G1–G3 | 2026-08-08 |
 | `prereg_phase2.py` | E6 minimal pair, E7 quantitative law, E9 corroboration | 2026-08-12 |
@@ -46,10 +55,19 @@ per-variant gates) is frozen and pending.
 | `prereg_e12.py` | External validity, MineSweeperMedium, gated probe first | 2026-08-21 |
 | `prereg_e13.py` | Cubic-damping perturbation of the cost-law threshold | 2026-08-21 |
 | `prereg_e14.py` | Second in-scope external test, PositionOnlyPendulum, per-variant gated probe first | 2026-09-11 |
+| `prereg_e15.py` | Learned exploration σ on GLEAM_g1_h0.05: cost direction, over-control, cost law at the measured σ | 2026-10-05 |
+| `prereg_e16.py` | In-domain memory arms (stack8, stack64, gru128) on GLEAM_g1_h0.05, per-arch gated | 2026-10-05 |
+| `prereg_e18.py` | E7 cost law under the continuing objective (no episode resets), mlp from scratch; two dated pre-data amendments | 2026-10-05 |
+| `prereg_e19.py` | Critic swap: exact LSTD(λ) critic against PPO's trained critic on the linear arm, continuing training | 2026-10-05 |
 
 Run any of them with no arguments to print the frozen predictions; pass a
-results file to score. `prereg_e10.py --check-clean <file>` verifies no data
-existed at freeze time.
+results file to score. `prereg_e10.py --check-clean <file>` checks for data
+in that file at invocation time. E13's header defines freezing at commit;
+its first preserved commit is 25 August despite the 21 August constant above.
+E14's first preserved commit is 13 September despite its 11 September
+declaration. E15, E16, E18 and E19 were frozen and run on 5–6 October without
+a pre-run commit; what supports their freeze declarations is listed in
+`PROVENANCE.md` §6. The constants are preserved; see `PROVENANCE.md`.
 
 ## Layout
 

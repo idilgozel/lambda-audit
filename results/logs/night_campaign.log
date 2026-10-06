@@ -1,0 +1,11 @@
+Tue Oct  6 16:18:17 BST 2026 evening campaign finished; applying E17/E18/E19 harness patches
+applied: harness/ppo_lambda.py now records linear_gain_init for linear arms
+applied: harness/ppo_lambda.py accepts --linear-sgd-lr (off by default)
+applied: --gleam-episode-len (continuing training) in harness/ppo_lambda.py + gleam_native.py
+applied: harness/ppo_lambda.py accepts --log-critic-fit (off by default)
+applied: harness/ppo_lambda.py accepts --oracle-critic lstd (off by default)
+45de828e2c6c18812140da9897d0ab30
+149974268a6512e25afb5cf1addd0a5f
+Tue Oct  6 16:18:17 BST 2026 starting E18
+Tue Oct  6 17:00:22 BST 2026 E18 finished; starting E19
+Tue Oct  6 17:52:07 BST 2026 E19 finished

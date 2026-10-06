@@ -52,8 +52,11 @@ Two further post-data amendments are verdict-neutral by construction and
 disclosed in the files that carry them: E12's scorer gained a duplicate-cell
 refusal after its grid re-ran the probe's reference cells, and a crash guard
 on its own success path. Git dates before 21 August are uninformative because
-the initial commit was amended; the freeze order is corroborated by cluster
-job logs instead (Appendix~\ref{app:provenance}).
+the initial commit was amended. Saved job logs corroborate run chronology
+and result rows, but their timestamps are printed by the job script and do
+not independently establish early freeze-before-data ordering. Later
+separate pre-run commits provide additional ordering evidence
+(Appendix~\ref{app:provenance}).
 
 \paragraph{What we would do differently.} Capability probes before grids:
 E11 spent 119 core-hours on a grid whose gates then failed, and every later

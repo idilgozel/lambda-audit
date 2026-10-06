@@ -117,7 +117,13 @@ implementation** and must be disclosed as such. The predictions themselves
 late. That is disclosable, but it is weaker than everything else in the audit
 and the paper should say so plainly rather than let it pass as equivalent.
 
-### 1.4 Git history cannot corroborate the freeze order — BLOCKER, with a clean fix
+### 1.4 Git history cannot corroborate the freeze order — historical assessment
+
+**Correction, 2026-10-05:** the assessment below is superseded by
+`PROVENANCE.md`. The job script prints the saved UTC and host fields; they
+are not independent scheduler attestations of preregistration times. The
+logs corroborate runs and result rows but do not repair missing early
+freeze receipts. The original assessment is retained below as project history.
 
 Everything from 7–18 August arrived in **one commit**, and that commit's
 author date (2026-08-17 16:49) precedes its committer date (2026-08-20 22:23)

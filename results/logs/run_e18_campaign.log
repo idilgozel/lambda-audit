@@ -1,0 +1,57 @@
+16:18:17 E18: 40 of 40 cells to run on 8 workers (host Idils-MacBook-Pro.local)
+16:26:48 task 4 (('GLEAM_g1_h0.05', 0.8), seed 4) done in 8.5 min [1/40]
+16:26:48 task 3 (('GLEAM_g1_h0.05', 0.8), seed 3) done in 8.5 min [2/40]
+16:26:48 task 2 (('GLEAM_g1_h0.05', 0.8), seed 2) done in 8.5 min [3/40]
+16:26:49 task 1 (('GLEAM_g1_h0.05', 0.8), seed 1) done in 8.5 min [4/40]
+16:26:50 task 7 (('GLEAM_g1_h0.05', 0.9), seed 2) done in 8.5 min [5/40]
+16:26:50 task 5 (('GLEAM_g1_h0.05', 0.8), seed 5) done in 8.5 min [6/40]
+16:26:51 task 6 (('GLEAM_g1_h0.05', 0.9), seed 1) done in 8.6 min [7/40]
+16:26:51 task 8 (('GLEAM_g1_h0.05', 0.9), seed 3) done in 8.6 min [8/40]
+16:35:12 task 14 (('GLEAM_g1_h0.05', 0.95), seed 4) done in 8.4 min [9/40]
+16:35:13 task 11 (('GLEAM_g1_h0.05', 0.95), seed 1) done in 8.4 min [10/40]
+16:35:13 task 10 (('GLEAM_g1_h0.05', 0.9), seed 5) done in 8.4 min [11/40]
+16:35:13 task 9 (('GLEAM_g1_h0.05', 0.9), seed 4) done in 8.4 min [12/40]
+16:35:13 task 13 (('GLEAM_g1_h0.05', 0.95), seed 3) done in 8.4 min [13/40]
+16:35:14 task 16 (('GLEAM_g1_h0.05', 0.98), seed 1) done in 8.4 min [14/40]
+16:35:15 task 12 (('GLEAM_g1_h0.05', 0.95), seed 2) done in 8.4 min [15/40]
+16:35:18 task 15 (('GLEAM_g1_h0.05', 0.95), seed 5) done in 8.5 min [16/40]
+16:43:33 task 22 (('GLEAM_g1_h0.05', 0.99), seed 2) done in 8.3 min [17/40]
+16:43:33 task 19 (('GLEAM_g1_h0.05', 0.98), seed 4) done in 8.3 min [18/40]
+16:43:35 task 21 (('GLEAM_g1_h0.05', 0.99), seed 1) done in 8.4 min [19/40]
+16:43:35 task 17 (('GLEAM_g1_h0.05', 0.98), seed 2) done in 8.4 min [20/40]
+16:43:37 task 18 (('GLEAM_g1_h0.05', 0.98), seed 3) done in 8.4 min [21/40]
+16:43:40 task 23 (('GLEAM_g1_h0.05', 0.99), seed 3) done in 8.4 min [22/40]
+16:43:43 task 24 (('GLEAM_g1_h0.05', 0.99), seed 4) done in 8.4 min [23/40]
+16:43:44 task 20 (('GLEAM_g1_h0.05', 0.98), seed 5) done in 8.5 min [24/40]
+16:51:53 task 25 (('GLEAM_g1_h0.05', 0.99), seed 5) done in 8.3 min [25/40]
+16:51:55 task 26 (('GLEAM_g1_h0.05', 0.995), seed 1) done in 8.4 min [26/40]
+16:51:57 task 28 (('GLEAM_g1_h0.05', 0.995), seed 3) done in 8.4 min [27/40]
+16:51:58 task 27 (('GLEAM_g1_h0.05', 0.995), seed 2) done in 8.4 min [28/40]
+16:51:58 task 30 (('GLEAM_g1_h0.05', 0.995), seed 5) done in 8.3 min [29/40]
+16:52:00 task 29 (('GLEAM_g1_h0.05', 0.995), seed 4) done in 8.4 min [30/40]
+16:52:02 task 31 (('GLEAM_g1_h0.05', 0.999), seed 1) done in 8.3 min [31/40]
+16:52:04 task 32 (('GLEAM_g1_h0.05', 0.999), seed 2) done in 8.3 min [32/40]
+17:00:13 task 33 (('GLEAM_g1_h0.05', 0.999), seed 3) done in 8.3 min [33/40]
+17:00:13 task 34 (('GLEAM_g1_h0.05', 0.999), seed 4) done in 8.3 min [34/40]
+17:00:14 task 35 (('GLEAM_g1_h0.05', 0.999), seed 5) done in 8.3 min [35/40]
+17:00:18 task 38 (('GLEAM_g1_h0.05', 1.0), seed 3) done in 8.3 min [36/40]
+17:00:20 task 39 (('GLEAM_g1_h0.05', 1.0), seed 4) done in 8.3 min [37/40]
+17:00:20 task 37 (('GLEAM_g1_h0.05', 1.0), seed 2) done in 8.4 min [38/40]
+17:00:21 task 40 (('GLEAM_g1_h0.05', 1.0), seed 5) done in 8.3 min [39/40]
+17:00:22 task 36 (('GLEAM_g1_h0.05', 1.0), seed 1) done in 8.4 min [40/40]
+17:00:22 finished, 0 failure(s); scoring
+==========================================================================
+ E18: E7 under the continuing objective (no resets), mlp from scratch
+==========================================================================
+GLEAM_g1_h0.05: G18 E(1.0) IQM 0.9952 (<= 1.05) -> PASS
+
+Gated in: ['GLEAM_g1_h0.05']
+  P22.1 GLEAM_g1_h0.05: measured 0.91477 vs grid-matched 0.983837, |diff| 0.06907 (OUTSIDE 0.01)   [continuum 0.985382; E7 episodic 0.86835]
+  P22.2: NOT SCORED (fewer than two measurable knees)
+  P22.3 GLEAM_g1_h0.05: plateau J_meas/J_AC mean 3.0826 over lambda [0.8, 0.9, 0.95, 0.98] (OUTSIDE 10%)   [plateau J 0.8895; ceiling law 0.3: 196.5% off, context]
+  GLEAM_g1_h0.05 E by lambda: 0.8: 2.561, 0.9: 3.076, 0.95: 8.161, 0.98: 2.404, 0.99: 1.115, 0.995: 1.013, 0.999: 0.998, 1.0: 0.995
+  GLEAM_g1_h0.05 gain IQM by lambda: 0.8: 8.60, 0.9: 5.14, 0.95: 5.66, 0.98: 10.79, 0.99: 4.42, 0.995: 2.27, 0.999: 1.91, 1.0: 1.86
+P22.1: FAIL   P22.2: NOT SCORED   P22.3: FAIL
+
+VERDICTS: {'G18-GLEAM_g1_h0.05': 'PASS', 'P22.1': 'FAIL', 'P22.2': 'NOT SCORED', 'P22.3': 'FAIL'}
+

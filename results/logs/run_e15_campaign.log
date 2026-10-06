@@ -1,0 +1,70 @@
+22:11:03 E15: 40 of 40 cells to run on 8 workers (host Idils-MacBook-Pro.local)
+22:20:04 task 1 (lambda 0.8, seed 1) done in 9.0 min [1/40]
+22:20:07 task 5 (lambda 0.8, seed 5) done in 9.1 min [2/40]
+22:20:09 task 2 (lambda 0.8, seed 2) done in 9.1 min [3/40]
+22:20:09 task 8 (lambda 0.9, seed 3) done in 9.1 min [4/40]
+22:20:10 task 6 (lambda 0.9, seed 1) done in 9.1 min [5/40]
+22:20:11 task 7 (lambda 0.9, seed 2) done in 9.1 min [6/40]
+22:20:14 task 3 (lambda 0.8, seed 3) done in 9.2 min [7/40]
+22:20:17 task 4 (lambda 0.8, seed 4) done in 9.2 min [8/40]
+22:29:29 task 9 (lambda 0.9, seed 4) done in 9.4 min [9/40]
+22:29:33 task 10 (lambda 0.9, seed 5) done in 9.4 min [10/40]
+22:29:37 task 11 (lambda 0.95, seed 1) done in 9.5 min [11/40]
+22:29:37 task 13 (lambda 0.95, seed 3) done in 9.5 min [12/40]
+22:29:38 task 12 (lambda 0.95, seed 2) done in 9.5 min [13/40]
+22:29:42 task 14 (lambda 0.95, seed 4) done in 9.5 min [14/40]
+22:29:44 task 15 (lambda 0.95, seed 5) done in 9.5 min [15/40]
+22:29:56 task 16 (lambda 0.98, seed 1) done in 9.7 min [16/40]
+08:29:37 task 17 (lambda 0.98, seed 2) done in 600.1 min [17/40]
+08:29:46 task 18 (lambda 0.98, seed 3) done in 600.2 min [18/40]
+08:29:53 task 19 (lambda 0.98, seed 4) done in 600.3 min [19/40]
+08:46:44 task 20 (lambda 0.98, seed 5) done in 617.1 min [20/40]
+08:46:45 task 21 (lambda 0.99, seed 1) done in 617.1 min [21/40]
+09:03:25 task 23 (lambda 0.99, seed 3) done in 633.7 min [22/40]
+09:03:26 task 22 (lambda 0.99, seed 2) done in 633.7 min [23/40]
+09:08:10 task 24 (lambda 0.99, seed 4) done in 638.2 min [24/40]
+11:00:46 task 25 (lambda 0.99, seed 5) done in 151.2 min [25/40]
+11:00:51 task 27 (lambda 0.995, seed 2) done in 151.0 min [26/40]
+11:00:55 task 26 (lambda 0.995, seed 1) done in 151.1 min [27/40]
+11:00:57 task 28 (lambda 0.995, seed 3) done in 134.2 min [28/40]
+11:00:57 task 30 (lambda 0.995, seed 5) done in 117.5 min [29/40]
+11:01:00 task 31 (lambda 0.999, seed 1) done in 117.6 min [30/40]
+11:01:01 task 29 (lambda 0.995, seed 4) done in 134.3 min [31/40]
+11:01:10 task 32 (lambda 0.999, seed 2) done in 113.0 min [32/40]
+11:09:11 task 33 (lambda 0.999, seed 3) done in 8.4 min [33/40]
+11:09:15 task 34 (lambda 0.999, seed 4) done in 8.4 min [34/40]
+11:09:16 task 35 (lambda 0.999, seed 5) done in 8.4 min [35/40]
+11:09:21 task 36 (lambda 1.0, seed 1) done in 8.4 min [36/40]
+11:09:22 task 37 (lambda 1.0, seed 2) done in 8.4 min [37/40]
+11:09:22 task 39 (lambda 1.0, seed 4) done in 8.4 min [38/40]
+11:09:24 task 38 (lambda 1.0, seed 3) done in 8.4 min [39/40]
+11:09:32 task 40 (lambda 1.0, seed 5) done in 8.4 min [40/40]
+11:09:32 finished, 0 failure(s); scoring
+G15  J(1.0) IQM 0.2206 vs J_ml 0.2196 (0.4%, <= 15%) -> PASS
+learned sigma (IQM over seeds) by lambda: 0.8: 0.036, 0.9: 0.036, 0.95: 0.065, 0.98: 0.104, 0.99: 0.117, 0.995: 0.125, 0.999: 0.133, 1.0: 0.138   [pinned runs used 0.300; diagnostic]
+
+P18.1 J(0.9) - J(1.0) = +0.0951 (excess ratio 1.431), CI [+0.0866, +0.1191] -> PASS
+P18.2 gain([0.8, 0.9]) - gain(1.0) = +27.851 (gains [29.13, 30.29] vs 1.859), CI [+17.171, +32.615] -> PASS
+VALIDATION against prereg_e10.py frozen tables (GLEAM_g1_h0.05)
+  lam 0.8    k_AC   22.4270 vs   22.4270 (rel 1.6e-07)   S -0.001300 vs -0.001300 (abs 2.2e-08)  ok
+  lam 0.9    k_AC   20.5469 vs   20.5469 (rel 2.0e-07)   S -0.000935 vs -0.000935 (abs 7.7e-09)  ok
+  lam 0.95   k_AC   17.6706 vs   17.6706 (rel 2.3e-07)   S -0.000525 vs -0.000525 (abs 2.1e-09)  ok
+  lam 0.98   k_AC   11.3946 vs   11.3946 (rel 1.7e-07)   S +0.000230 vs +0.000230 (abs 2.6e-08)  ok
+  lam 0.99   k_AC    2.1971 vs    2.1971 (rel 2.1e-07)   S +0.018381 vs +0.018381 (abs 3.4e-08)  ok
+  lam 0.995  k_AC    1.7564 vs    1.7564 (rel 6.3e-07)   S +0.026583 vs +0.026583 (abs 1.3e-08)  ok
+  lam 0.999  k_AC    1.5488 vs    1.5488 (rel 4.3e-07)   S +0.031870 vs +0.031870 (abs 5.9e-08)  ok
+  lam 1.0    k_AC    1.5066 vs    1.5066 (rel 5.5e-08)   S +0.033067 vs +0.033067 (abs 4.4e-09)  ok
+  grid lambda_half 0.983837 vs frozen 0.983837 (abs 4.3e-08)  ok
+P18.3 per lambda: measured E, theory E at measured s_e, k_AC(lambda; s_e), measured gain IQM
+      0.8    E_meas 1.7755  E_theory 1.4781  k_AC  36.671  gain  29.130  sigma 0.036
+      0.9    E_meas 1.4375  E_theory 1.4472  k_AC  35.750  gain  30.290  sigma 0.036
+      0.95   E_meas 1.4388  E_theory 1.3992  k_AC  32.808  gain  31.410  sigma 0.065
+      0.98   E_meas 1.3956  E_theory 1.3567  k_AC  26.291  gain  20.344  sigma 0.104
+      0.99   E_meas 1.1505  E_theory 1.3245  k_AC  19.444  gain   5.063  sigma 0.117
+      0.995  E_meas 1.0344  E_theory 1.0022  k_AC   1.830  gain   2.472  sigma 0.125
+      0.999  E_meas 1.0097  E_theory 1.0003  k_AC   1.585  gain   1.943  sigma 0.133
+      1.0    E_meas 1.0045  E_theory 1.0011  k_AC   1.537  gain   1.859  sigma 0.138
+P18.3 lambda_half measured 0.98023 vs theory-at-measured-sigma 0.99132 (|diff| 0.01109, <= 0.01) -> FAIL   [pinned-sigma reference 0.983837]
+
+VERDICTS: {'G15': 'PASS', 'P18.1': 'PASS', 'P18.2': 'PASS', 'P18.3': 'FAIL'}
+

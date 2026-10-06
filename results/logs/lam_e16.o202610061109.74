@@ -1,0 +1,6 @@
+host      : Idils-MacBook-Pro.local (local, arm64)
+task      : 74 -> ('stack8', 0.999), seed 4
+args      : --env GLEAM_g1_h0.05 --arch stack8 --gae-lambda 0.999 --gamma 0.9975031223974601 --fix-sigma 0.3 --total-timesteps 15000000 --results-name results_e16.jsonl
+starting  : 2026-10-06T14:15:56Z
+{"run": "GLEAM_g1_h0.05_stack8_lam0.999_s4", "env": "GLEAM_g1_h0.05", "arch": "stack8", "lam": 0.999, "seed": 4, "final_return": -16.445606053819844, "deployed_return": -0.2041523219026395, "gap_value": -1.5644738989175024, "gap_lambda": -0.44629222560563336, "total_timesteps": 15000000, "gamma": 0.9975031223974601, "lr": 0.0003, "num_envs": 16, "num_steps": 128, "stack": 8, "wallclock_s": 519.9, "final_gain": 1.6311950745312118, "J_rate": 0.2041523219026395, "excess_cost": 0.9296767033943338, "fix_sigma": 0.3, "ref_J_opt": 0.19891439813923634, "ref_k_ml": 1.6490013359760836, "ref_J_ml": 0.2195949636656064, "ref_k_AC": 24.793797152108077, "ref_J_AC": 0.29639043021265854, "ref_rThK0": 0.3, "arm": "coupled"}
+finished  : 2026-10-06T14:24:37Z  rc=0  wall=521s

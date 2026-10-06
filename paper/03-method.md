@@ -205,9 +205,10 @@ per-node compilation.
 
 The claims are adjudicated by preregistration, and the preregistrations are
 **executable**: frozen constants and scoring functions live in Python files
-whose freeze is asserted mechanically — the deployment script runs every
-prereg as a pre-flight and refuses to submit if any sentinel remains — so a
-prediction cannot drift between freeze and verdict. Amendments are dated, and
+with deployment checks for unset constants and explicit checks for existing
+data. These establish readiness at invocation, not independent authentication
+of historical freeze times or protection against later edits. The saved
+chronology and its limits are documented in `PROVENANCE.md`. Amendments are dated, and
 are made before the relevant data exists except where explicitly disclosed
 otherwise in the amendment text itself. Scorers for the experiments whose
 results files accumulate across submissions (E6/E7/E9, E12, E13) refuse to

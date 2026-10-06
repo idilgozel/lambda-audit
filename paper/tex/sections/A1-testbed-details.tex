@@ -63,10 +63,9 @@ run on plain numpy/torch with no per-node compilation.
 
 The claims are adjudicated by preregistration, and the preregistrations
 are \textbf{executable}: frozen constants and scoring functions live in
-Python files whose freeze is asserted mechanically --- the deployment
-script runs every prereg as a pre-flight and refuses to submit if any
-sentinel remains --- so a prediction cannot drift between freeze and
-verdict. Amendments are dated, and are made before the relevant data
+Python files with deployment checks for unset constants and explicit checks
+for existing data. These checks establish readiness when invoked; they do
+not authenticate historical freeze times or prevent later file edits. Amendments are dated, and are made before the relevant data
 exists except where explicitly disclosed otherwise in the amendment text
 itself. Scorers for the experiments whose results files accumulate
 across submissions (E6/E7/E9, E12, E13) refuse to run on data with
@@ -101,8 +100,29 @@ matched across arms and architectures so that comparisons are paired at
 the seed level.
 
 
-\subsection{Number provenance}
+\subsection{Run chronology and number provenance}
 \label{app:provenance}
+
+An audit of the saved artifacts on 5 October 2026 matched all
+956 Myriad result rows exactly to JSON lines in 958 saved job logs.
+Two E12 tasks have incomplete original logs and completed replacement logs
+under a later job ID; both histories are retained. Host and UTC fields are
+printed by the job script, not independently signed by the scheduler.
+The initial amended commit contains preregistrations alongside their data,
+so early freeze-before-data ordering is not independently authenticated.
+E12 and E13 have separate preserved prereg commits preceding their first
+saved runs by 20 minutes 23 seconds and 3 minutes 11 seconds, respectively;
+local Git dates also have limits as independent timestamps. No saved positive
+\texttt{--check-clean} receipt was located. E13's commit-based freeze is
+25 August despite its retained 21 August draft constant. E13 ran locally;
+local E14 records are likewise distinguished from cluster logs. The
+repository's \texttt{PROVENANCE.md} records the full evidence and limits.
+
+Curve filenames reuse run identifiers across some experiments. In particular,
+the 24 shared E10/E13 curve files retain histories consistent with E10's
+15M-step budget, not separate E13 1M-step histories. Their final result rows
+remain separately matched to logs; E13's registered scorer uses those rows.
+Curve-based reproduction requires a release with unambiguous run provenance.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}

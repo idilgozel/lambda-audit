@@ -1,60 +1,100 @@
 #!/usr/bin/env bash
-# Regenerate the provenance chronology in PROVENANCE.md section 2 from the
-# committed cluster logs. The logs carry UTC start times and host lines written
-# by Myriad's scheduler, and SGE job IDs increase monotonically across the whole
-# cluster, so neither can be chosen or reordered by a submitter. This is the
-# evidence that each preregistration freeze preceded the data it scores; the git
-# history is not (see PROVENANCE.md section 1).
-#
-# Usage: bash analysis/provenance_chronology.sh
-set -uo pipefail
-
+# Summarise preserved logs; this is not live scheduler accounting.
+# Optional argument: another repository/evidence snapshot root.
+set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/.." && pwd)"
-LOGS="$ROOT/results/logs"
+ROOT="${1:-$(cd "$HERE/.." && pwd)}"
+python3 - "$ROOT" <<'PY'
+from pathlib import Path
+import collections
+import json
+import re
+import sys
 
-[ -d "$LOGS" ] || { echo "no results/logs directory at $LOGS"; exit 2; }
-
-# Job name -> the preregistration whose freeze governs it. Kept explicit rather
-# than inferred, so a new experiment cannot silently appear ungoverned.
-governing() {
-  case "$1" in
-    lam_cap|lam_pilot) echo "prereg_lambda_pilot.py" ;;
-    lam_e6|lam_e9)     echo "prereg_phase2.py" ;;
-    lam_e7)            echo "prereg_phase2.py + prereg_e7_bias.py" ;;
-    lam_e10)           echo "prereg_e10.py" ;;
-    lam_e11)           echo "prereg_e11.py" ;;
-    lam_e12p|lam_e12)  echo "prereg_e12.py" ;;
-    *)                 echo "UNGOVERNED -- add it to governing()" ;;
-  esac
+root = Path(sys.argv[1])
+logs = root / 'results' / 'logs'
+if not logs.is_dir():
+    raise SystemExit(f'No saved log directory: {logs}')
+governing = {
+    'lam_cap': ['prereg_lambda_pilot.py'],
+    'lam_pilot': ['prereg_lambda_pilot.py'],
+    'lam_e6': ['prereg_phase2.py'],
+    'lam_e9': ['prereg_phase2.py'],
+    'lam_e7': ['prereg_phase2.py', 'prereg_e7_bias.py'],
+    'lam_e10': ['prereg_e10.py'],
+    'lam_e11': ['prereg_e11.py'],
+    'lam_e12p': ['prereg_e12.py'],
+    'lam_e12': ['prereg_e12.py'],
+    'E13-local': ['prereg_e13.py'],
 }
 
-freeze_date() {
-  local f="$ROOT/$1"
-  [ -f "$f" ] || { echo "?"; return; }
-  grep -m1 -o 'FROZEN [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' "$f" | awk '{print $2}'
-}
+def declarations(name):
+    files = ['prereg_e14.py'] if name.startswith('lam_e14') else governing.get(name, [])
+    if not files:
+        return 'UNMAPPED'
+    found = []
+    for f in files:
+        p = root / f
+        text = p.read_text() if p.exists() else ''
+        m = re.search(r'FROZEN (\d{4}-\d{2}-\d{2})', text)
+        if not m:
+            m = re.search(r'FROZEN_ON\s*=\s*[\"\x27](\d{4}-\d{2}-\d{2})', text)
+        found.append(f"{f} ({m[1] if m else 'date not found'})")
+    return '; '.join(found)
 
-printf '%-12s %-9s %6s  %-21s  %-21s  %-34s %s\n' \
-  "job name" "SGE id" "tasks" "first start (UTC)" "last finish (UTC)" "governing freeze" "classes"
+groups = collections.defaultdict(list)
+for p in sorted(logs.iterdir()):
+    fn = re.fullmatch(r'(.+)\.o(\d+)\.(\d+)', p.name)
+    e13 = re.fullmatch(r'e13\.(\d+)\.log', p.name)
+    if not fn and not e13:
+        continue
+    text = p.read_text()
+    host = re.search(r'^host\s*:\s*(.+)$', text, re.M)
+    host = host[1] if host else ''
+    cls = re.fullmatch(r'node-([a-z0-9]+)-\d+\.myriad\.ucl\.ac\.uk', host)
+    source = 'Myriad' if cls else 'local' if e13 or '(local,' in host else 'unknown'
+    name, run_id, task = (fn[1], fn[2], int(fn[3])) if fn else ('E13-local', '-', int(e13[1]))
+    start = re.search(r'^start(?:ing\s*|ed)\s*:\s*(\S+)', text, re.M)
+    finish = re.search(r'^finished\s*:\s*(\S+)', text, re.M)
+    rows = 0
+    for line in text.splitlines():
+        if line.startswith('{"run":'):
+            try:
+                json.loads(line)
+            except json.JSONDecodeError as e:
+                raise SystemExit(f'Invalid result JSON in {p}: {e}')
+            rows += 1
+    groups[(source, name, run_id)].append({
+        'task': task, 'start': start[1] if start else None,
+        'finish': finish[1] if finish else None, 'rows': rows,
+        'class': cls[1] if cls else host,
+    })
 
-# Sort by first start time so the table reads chronologically and any job ID
-# that is out of order with its start time is visible rather than hidden.
-for j in $(ls "$LOGS"/*.o* 2>/dev/null | xargs -n1 basename | sed 's/\.o.*//' | sort -u); do
-  first=$(grep -h '^starting' "$LOGS/$j".o* 2>/dev/null | sort | head -1 | sed 's/starting *: //')
-  last=$(grep -h '^finished' "$LOGS/$j".o* 2>/dev/null | sort | tail -1 | sed 's/finished *: //')
-  jid=$(ls "$LOGS/$j".o* 2>/dev/null | head -1 | sed 's/.*\.o\([0-9]*\)\..*/\1/')
-  n=$(ls "$LOGS/$j".o* 2>/dev/null | wc -l | tr -d ' ')
-  cls=$(grep -h '^host' "$LOGS/$j".o* 2>/dev/null \
-        | sed 's/.*node-\([a-z0-9]*\)-.*/\1/' | sort -u | paste -sd, -)
-  gov=$(governing "$j")
-  # Report the freeze date of the first named prereg; multi-prereg jobs are
-  # named in full in the governing column.
-  fd=$(freeze_date "$(echo "$gov" | awk '{print $1}')")
-  printf '%-12s %-9s %6s  %-21s  %-21s  %-34s %s\n' \
-    "$j" "$jid" "$n" "${first:-?}" "${last:-?}" "$gov (frozen $fd)" "${cls:-?}"
-done | sort -k4
+records = []
+for (source, name, run_id), tasks in groups.items():
+    starts = sorted(t['start'] for t in tasks if t['start'])
+    finishes = sorted(t['finish'] for t in tasks if t['finish'])
+    records.append((starts[0] if starts else '?', source, name, run_id, tasks, finishes))
 
-echo
-echo "Job IDs must increase with first start time. Any inversion above is a"
-echo "finding, not a formatting artifact."
+print('Saved-log chronology; classification follows recorded host lines.')
+print('Dates below are declarations in current files, not independently verified freeze times.')
+print('Local run labels are not SGE job IDs. Last finish covers only tasks with finish markers.\n')
+print('source\tjob\tjob/run id\tlogs\tresult rows\tfinish markers\tfirst start UTC\tlast recorded finish UTC\tclasses/host\tdeclared freezes')
+for first, source, name, run_id, tasks, finishes in sorted(records):
+    classes = ','.join(sorted({t['class'] for t in tasks if t['class']})) or '(see local provenance)'
+    fields = [source, name, run_id, str(len(tasks)), str(sum(t['rows'] for t in tasks)), str(len(finishes)), first, finishes[-1] if finishes else '?', classes, declarations(name)]
+    print('\t'.join(fields))
+    missing_rows = [str(t['task']) for t in tasks if not t['rows']]
+    missing_start = [str(t['task']) for t in tasks if not t['start']]
+    missing_finish = [str(t['task']) for t in tasks if not t['finish']]
+    if missing_rows:
+        print('  No result row: tasks ' + ', '.join(missing_rows))
+    if missing_start:
+        print('  No start marker: tasks ' + ', '.join(missing_start))
+    if missing_finish:
+        note = ' (E13 runner does not write finish markers)' if name == 'E13-local' else ''
+        print('  No finish marker: tasks ' + ', '.join(missing_finish) + note)
+
+print('\nSaved stdout supports run chronology and row matching; it does not authenticate historical freeze-before-data claims.')
+print('Job IDs alone do not establish preregistration time. See PROVENANCE.md for Git evidence and its limits.')
+PY

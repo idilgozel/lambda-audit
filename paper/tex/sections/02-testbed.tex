@@ -78,10 +78,10 @@ implementation before any run.
 
 \subsection{Audit protocol}
 
-Claims are adjudicated by \emph{executable} preregistration: frozen constants
-and scoring functions in a Python file whose freeze is machine-checked at
-deployment and which refuses to certify a freeze if data for that experiment
-already exist. Amendments are dated and disclosed in the file that carries
+Claims are adjudicated by \emph{executable} preregistration: recorded constants
+and scoring functions, with deployment checks for unset constants and explicit
+checks for existing data. These establish readiness at invocation, not an
+independently authenticated historical freeze. Amendments are dated and disclosed in the file that carries
 them; post-data amendments are labelled as such. Scorers for experiments whose
 result files accumulate across submissions refuse duplicated cells; capability
 gates are scored before predictions and a failed gate leaves its predictions

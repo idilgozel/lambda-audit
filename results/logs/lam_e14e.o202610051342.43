@@ -1,0 +1,4 @@
+host      : Idils-MacBook-Pro.local (local, arm64)
+task      : 43 -> config line 11, seed 3
+args      : --env PositionOnlyPendulumEasy --arch gru128 --gae-lambda 0.98 --gamma 0.99 --total-timesteps 15000000 --fix-sigma 0.5 --final-eval-episodes 1000 --results-name results_e14.jsonl
+starting  : 2026-10-05T13:34:29Z

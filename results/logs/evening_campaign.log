@@ -1,0 +1,8 @@
+Mon Oct  5 14:11:16 BST 2026 waiting for run_e14.py to exit
+Mon Oct  5 14:35:47 BST 2026 waiting for run_e14.py to exit
+Mon Oct  5 15:35:48 BST 2026 waiting for run_e14.py to exit
+Mon Oct  5 22:11:03 BST 2026 E14 finished; applying final_sigma patch
+applied: harness/ppo_lambda.py now records final_sigma for learned-sigma runs
+Mon Oct  5 22:11:03 BST 2026 starting E15
+Tue Oct  6 11:09:32 BST 2026 E15 finished; starting E16
+Tue Oct  6 16:17:34 BST 2026 E16 finished
